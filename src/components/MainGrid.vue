@@ -1,9 +1,17 @@
 <script setup>
+import { ref, defineExpose } from 'vue'
 import MainColumn from './MainColumn.vue'
+import gsap from 'gsap'
+
+const gridRef = ref(null)
+
+defineExpose({
+  gridRef,
+})
 </script>
 
 <template>
-  <div class="grid">
+  <div class="grid" ref="gridRef">
     <MainColumn />
     <MainColumn />
     <MainColumn />
