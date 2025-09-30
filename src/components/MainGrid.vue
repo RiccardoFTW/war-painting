@@ -1,9 +1,13 @@
 <script setup>
 import { ref, defineExpose } from 'vue'
 import MainColumn from './MainColumn.vue'
-import gsap from 'gsap'
 
 const gridRef = ref(null)
+const emit = defineEmits(['painting-click'])
+
+const handlePaintingClick = (paintingData) => {
+  emit('painting-click', paintingData)
+}
 
 defineExpose({
   gridRef,
@@ -12,11 +16,11 @@ defineExpose({
 
 <template>
   <div class="grid" ref="gridRef">
-    <MainColumn />
-    <MainColumn />
-    <MainColumn />
-    <MainColumn />
-    <MainColumn />
+    <MainColumn @painting-click="handlePaintingClick" />
+    <MainColumn @painting-click="handlePaintingClick" />
+    <MainColumn @painting-click="handlePaintingClick" />
+    <MainColumn @painting-click="handlePaintingClick" />
+    <MainColumn @painting-click="handlePaintingClick" />
   </div>
 </template>
 
@@ -26,6 +30,6 @@ defineExpose({
   width: max-content;
   height: max-content;
   display: flex;
-  gap: 5vw;
+  gap: 10vw;
 }
 </style>

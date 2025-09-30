@@ -1,5 +1,5 @@
 <template>
-  <div class="painting">
+  <div class="painting" :data-id="paintingId" @click="handleClick">
     <img :src="props.src" :alt="props.alt" />
   </div>
 </template>
@@ -34,5 +34,15 @@
 const props = defineProps({
   src: String,
   alt: String,
+  paintingId: Number,
+  paintingData: Object,
 })
+
+const emit = defineEmits(['click'])
+
+const handleClick = (e) => {
+  e.stopPropagation()
+  console.log('click su painting:', props.paintingData)
+  emit('click', props.paintingData)
+}
 </script>
