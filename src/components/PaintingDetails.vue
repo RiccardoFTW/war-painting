@@ -23,8 +23,14 @@
 import { ref, defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
-  isVisible: Boolean,
-  currentPainting: Object,
+  isVisible: {
+    type: Boolean,
+    default: false,
+  },
+  currentPainting: {
+    type: Object,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['close'])
@@ -49,7 +55,7 @@ defineExpose({
   height: 100vh;
   background: #000;
   color: white;
-  transform: translateX(50vw);
+  transform: translateX(60vw);
   transition: transform 0.3s ease;
   z-index: 9999;
 
@@ -96,7 +102,7 @@ defineExpose({
   position: absolute;
   width: 100%;
   height: 2px;
-  background: white;
+  background: #111;
   top: 50%;
   left: 0;
 }

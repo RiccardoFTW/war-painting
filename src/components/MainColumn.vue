@@ -1,3 +1,17 @@
+<template>
+  <div class="column">
+    <PaintingImg
+      v-for="(image, index) in images"
+      :key="index"
+      :src="image.src"
+      :alt="image.alt"
+      :painting-id="paintingData[index]?.id"
+      :painting-data="paintingData[index]"
+      @click="handlePaintingClick"
+    />
+  </div>
+</template>
+
 <script setup>
 import PaintingImg from './PaintingImg.vue'
 const images = [
@@ -31,24 +45,10 @@ const paintingData = [
 
 const emit = defineEmits(['painting-click'])
 
-const handlePaintingClick = (paintingData) => {
-  emit('painting-click', paintingData)
+const handlePaintingClick = (clickData) => {
+  emit('painting-click', clickData)
 }
 </script>
-
-<template>
-  <div class="column">
-    <PaintingImg
-      v-for="(image, index) in images"
-      :key="index"
-      :src="image.src"
-      :alt="image.alt"
-      :painting-id="paintingData[index]?.id"
-      :painting-data="paintingData[index]"
-      @click="handlePaintingClick"
-    />
-  </div>
-</template>
 
 <style scoped>
 .column {

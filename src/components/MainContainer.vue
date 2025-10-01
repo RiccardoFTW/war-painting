@@ -1,18 +1,46 @@
+<template>
+  <div class="container" ref="containerRef" @click="handleContainerClick">
+    <MainGrid ref="mainGridRef" @painting-click="openDetails" />
+
+    <PaintingDetails
+      ref="paintingDetailsRef"
+      :is-visible="showDetails"
+      :current-painting="currentPainting"
+      @close="closeDetails"
+    />
+  </div>
+</template>
+
 <script setup>
+// IMPORTS
 import { ref, onMounted, nextTick } from 'vue'
 import MainGrid from './MainGrid.vue'
 import PaintingDetails from './PaintingDetails.vue'
 import { Draggable, Flip, SplitText } from 'gsap/all'
 import gsap from 'gsap'
+
+// PLUGIN REGISTRATION
 gsap.registerPlugin(Draggable, Flip, SplitText)
 
+// REACTIVE STATE
+
+// Grid Refs
 const containerRef = ref(null)
 const mainGridRef = ref(null)
 const paintingDetailsRef = ref(null)
+
+// State management
 const isDragging = ref(false)
 const showDetails = ref(false)
 const currentPainting = ref(null)
 
+// Flip animation state
+const currentPaintingElement = ref(null)
+const originalParent = ref(null)
+
+// FUNCTIONS
+
+// Grid Functions
 const centerGrid = () => {
   const grid = mainGridRef.value.gridRef
 
@@ -61,6 +89,7 @@ const intro = () => {
   })
 }
 
+// Drag functions
 const setupDraggable = () => {
   const grid = mainGridRef.value.gridRef
 
@@ -125,6 +154,162 @@ const addScrollListener = () => {
   window.addEventListener('wheel', handleWheel, { passive: false })
 }
 
+// Details functions
+const openDetails = (clickData) => {
+  currentPainting.value = clickData.data
+  showDetails.value = true
+
+  flipProduct(clickData.element)
+
+  setTimeout(() => {
+    animateTexts(clickData.data.id)
+  }, 800)
+
+  window.addEventListener('mousemove', handleMouseMove)
+
+  nextTick(() => {
+    const cross = paintingDetailsRef.value?.crossRef
+    if (cross) {
+      gsap.set(cross, { scale: 1, opacity: 0 })
+    }
+  })
+}
+
+const closeDetails = () => {
+  unFlipProduct()
+  window.removeEventListener('mousemove', handleMouseMove)
+
+  const cross = paintingDetailsRef.value?.crossRef
+  if (cross) {
+    gsap.to(cross, {
+      scale: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    })
+  }
+  showDetails.value = false
+  currentPainting.value = null
+
+  setTimeout(() => {
+    showDetails.value = false
+    currentPainting.value = null
+  }, 300)
+}
+
+const flipProduct = (clickedElement) => {
+  const detailsThumb = document.querySelector('.details__thumb')
+
+  if (!detailsThumb || !clickedElement) return
+
+  currentPaintingElement.value = clickedElement
+  originalParent.value = clickedElement.parentNode
+
+  const state = Flip.getState(clickedElement)
+
+  detailsThumb.appendChild(clickedElement)
+
+  Flip.from(state, {
+    absolute: true,
+    duration: 1.2,
+    ease: 'power3.inOut',
+  })
+}
+
+const unFlipProduct = () => {
+  if (!currentPaintingElement.value || !originalParent.value) return
+
+  const state = Flip.getState(currentPaintingElement.value)
+
+  originalParent.value.appendChild(currentPaintingElement.value)
+
+  Flip.from(state, {
+    absolute: true,
+    duration: 1.2,
+    ease: 'power3.inOut',
+    onComplete: () => {
+      currentPaintingElement.value = null
+      originalParent.value = null
+    },
+  })
+}
+
+// Animations functions
+const animateTexts = (paintingId) => {
+  const title = document.querySelector(`[data-title="${paintingId}"]`)
+  const description = document.querySelector(`[data-desc="${paintingId}"]`)
+
+  if (title) {
+    const splitTitle = new SplitText(title, {
+      type: 'lines, chars',
+      charsClass: 'char',
+    })
+
+    gsap.fromTo(
+      title.querySelectorAll('.char'),
+      { y: '100%' },
+      {
+        y: 0,
+        duration: 1.1,
+        delay: 0.4,
+        ease: 'power3.inOut',
+        stagger: 0.025,
+      },
+    )
+  }
+
+  if (description) {
+    const splitDesc = new SplitText(description, {
+      type: 'lines',
+      linesClass: 'line',
+    })
+    gsap.fromTo(
+      description.querySelectorAll('.line'),
+      { y: '100%' },
+      {
+        y: 0,
+        duration: 1.1,
+        delay: 0.6,
+        ease: 'power3.inOut',
+        stagger: 0.05,
+      },
+    )
+  }
+}
+
+const handleMouseMove = (e) => {
+  if (!showDetails.value) return
+
+  const cross = paintingDetailsRef.value?.crossRef
+  if (!cross) return
+
+  const x = e.clientX
+  const y = e.clientY
+
+  const isInPanel = x > window.innerWidth / 2
+
+  if (isInPanel) {
+    gsap.to(cross, {
+      opacity: 0,
+      duration: 0.2,
+    })
+  } else {
+    gsap.to(cross, {
+      x: x - 20,
+      y: y - 20,
+      opacity: 1,
+      duration: 0.1,
+      ease: 'none',
+    })
+  }
+}
+
+const handleContainerClick = (e) => {
+  if (showDetails.value && e.clientX < window.innerWidth / 2) {
+    closeDetails()
+  }
+}
+
+// Observer functions
 const observeProducts = () => {
   const paintings = document.querySelectorAll('.painting')
 
@@ -161,73 +346,7 @@ const observeProducts = () => {
   })
 }
 
-const handleContainerClick = (e) => {
-  if (showDetails.value && e.clientX < window.innerWidth / 2) {
-    closeDetails()
-  }
-}
-
-const handleMouseMove = (e) => {
-  if (!showDetails.value) return
-
-  const cross = paintingDetailsRef.value?.crossRef
-  if (!cross) return
-
-  // Posizione del mouse
-  const x = e.clientX
-  const y = e.clientY
-
-  // Controlla se il mouse è nella zona del pannello (metà destra)
-  const isInPanel = x > window.innerWidth / 2
-
-  if (isInPanel) {
-    // Mouse nel pannello -> nascondi X cursore
-    gsap.to(cross, {
-      opacity: 0,
-      duration: 0.2,
-    })
-  } else {
-    // Mouse fuori dal pannello -> mostra X cursore e segui mouse
-    gsap.to(cross, {
-      x: x - 20, // Offset per centrare
-      y: y - 20,
-      opacity: 1,
-      duration: 0.1,
-      ease: 'none',
-    })
-  }
-}
-
-const openDetails = (paintingData) => {
-  currentPainting.value = paintingData
-  showDetails.value = true
-
-  window.addEventListener('mousemove', handleMouseMove)
-
-  nextTick(() => {
-    const cross = paintingDetailsRef.value?.crossRef
-    if (cross) {
-      gsap.set(cross, { scale: 1, opacity: 0 }) // Inizia invisibile
-    }
-  })
-}
-
-const closeDetails = () => {
-  // Rimuovi listener mouse
-  window.removeEventListener('mousemove', handleMouseMove)
-
-  const cross = paintingDetailsRef.value?.crossRef
-  if (cross) {
-    gsap.to(cross, {
-      scale: 0,
-      duration: 0.4,
-      ease: 'power2.out',
-    })
-  }
-  showDetails.value = false
-  currentPainting.value = null
-}
-
+// LIFECYCLE
 onMounted(async () => {
   await nextTick()
   intro()
@@ -237,19 +356,6 @@ onMounted(async () => {
   observeProducts()
 })
 </script>
-
-<template>
-  <div class="container" ref="containerRef" @click="handleContainerClick">
-    <MainGrid ref="mainGridRef" @painting-click="openDetails" />
-
-    <PaintingDetails
-      ref="paintingDetailsRef"
-      :is-visible="showDetails"
-      :current-painting="currentPainting"
-      @close="closeDetails"
-    />
-  </div>
-</template>
 
 <style scoped>
 .container {

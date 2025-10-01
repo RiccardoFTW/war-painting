@@ -1,19 +1,3 @@
-<script setup>
-import { ref, defineExpose } from 'vue'
-import MainColumn from './MainColumn.vue'
-
-const gridRef = ref(null)
-const emit = defineEmits(['painting-click'])
-
-const handlePaintingClick = (paintingData) => {
-  emit('painting-click', paintingData)
-}
-
-defineExpose({
-  gridRef,
-})
-</script>
-
 <template>
   <div class="grid" ref="gridRef">
     <MainColumn @painting-click="handlePaintingClick" />
@@ -23,6 +7,22 @@ defineExpose({
     <MainColumn @painting-click="handlePaintingClick" />
   </div>
 </template>
+
+<script setup>
+import { ref, defineExpose } from 'vue'
+import MainColumn from './MainColumn.vue'
+
+const gridRef = ref(null)
+const emit = defineEmits(['painting-click'])
+
+const handlePaintingClick = (clickData) => {
+  emit('painting-click', clickData)
+}
+
+defineExpose({
+  gridRef,
+})
+</script>
 
 <style scoped>
 .grid {

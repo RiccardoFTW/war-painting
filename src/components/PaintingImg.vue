@@ -1,8 +1,43 @@
 <template>
-  <div class="painting" :data-id="paintingId" @click="handleClick">
-    <img :src="props.src" :alt="props.alt" />
+  <div class="painting" ref="paintingRef" :data-id="paintingId" @click="handleClick">
+    <img :src="src" :alt="alt" />
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+const props = defineProps({
+  src: {
+    type: String,
+    required: true,
+  },
+  alt: {
+    type: String,
+    required: true,
+  },
+  paintingId: {
+    type: Number,
+    required: true,
+  },
+  paintingData: {
+    type: Object,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['click'])
+
+const paintingRef = ref(null)
+
+const handleClick = (e) => {
+  e.stopPropagation()
+  emit('click', {
+    data: props.paintingData,
+    element: paintingRef.value,
+  })
+}
+</script>
 
 <style scoped>
 .painting {
@@ -29,20 +64,3 @@
   }
 }
 </style>
-
-<script setup>
-const props = defineProps({
-  src: String,
-  alt: String,
-  paintingId: Number,
-  paintingData: Object,
-})
-
-const emit = defineEmits(['click'])
-
-const handleClick = (e) => {
-  e.stopPropagation()
-  console.log('click su painting:', props.paintingData)
-  emit('click', props.paintingData)
-}
-</script>
