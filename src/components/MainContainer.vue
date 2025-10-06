@@ -57,9 +57,12 @@ const centerGrid = () => {
   gsap.set(grid, { x: centerX, y: centerY })
 }
 
-const intro = () => {
+const intro = async () => {
+  await nextTick()
+
   const grid = mainGridRef.value.gridRef
   const paintings = document.querySelectorAll('.painting')
+  const details = document.querySelector('.details')
 
   if (!grid) return
 
@@ -74,6 +77,10 @@ const intro = () => {
     opacity: 0,
   })
 
+  if (details) {
+    timeline.set(details, { opacity: 0 })
+  }
+
   timeline.to(paintings, {
     scale: 1,
     opacity: 1,
@@ -86,6 +93,11 @@ const intro = () => {
     scale: 1,
     duration: 1.2,
     ease: 'power3.inOut',
+    onComplete: () => {
+      if (details) {
+        gsap.set(details, { opacity: 1 })
+      }
+    },
   })
 }
 
@@ -156,8 +168,32 @@ const addScrollListener = () => {
 
 // Details functions
 const openDetails = (clickData) => {
+  if (showDetails.value) {
+    closeDetails()
+    return
+  }
+
   currentPainting.value = clickData.data
   showDetails.value = true
+
+  nextTick(() => {
+    const details = document.querySelector('.details')
+    if (details) {
+      gsap.fromTo(
+        details,
+        {
+          x: window.innerWidth <= 600 ? '90%' : '60vw',
+          opacity: 0.8,
+        },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: 'power3.out',
+        },
+      )
+    }
+  })
 
   flipProduct(clickData.element)
 
@@ -168,7 +204,7 @@ const openDetails = (clickData) => {
   window.addEventListener('mousemove', handleMouseMove)
 
   nextTick(() => {
-    const cross = paintingDetailsRef.value?.crossRef
+    const cross = document.querySelector('.cross')
     if (cross) {
       gsap.set(cross, { scale: 1, opacity: 0 })
     }
@@ -176,24 +212,82 @@ const openDetails = (clickData) => {
 }
 
 const closeDetails = () => {
+  const title = document.querySelector('.details__title')
+  const description = document.querySelector('.details__body')
+  const thumb = document.querySelector('.details__thumb')
+
+  const timeline = gsap.timeline()
+
+  if (title && title.querySelectorAll('.char').length > 0) {
+    timeline.to(
+      title.querySelectorAll('.char'),
+      {
+        y: '-100%',
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.in',
+        stagger: 0.01,
+      },
+      0,
+    )
+  }
+
+  if (description && description.querySelectorAll('.line').length > 0) {
+    timeline.to(
+      description.querySelectorAll('.line'),
+      {
+        y: '-100%',
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power3.in',
+        stagger: 0.03,
+      },
+      0.1,
+    )
+  }
+
+  if (thumb) {
+    timeline.to(
+      thumb,
+      {
+        scale: 0.95,
+        opacity: 0.7,
+        duration: 0.8,
+        ease: 'power3.in',
+      },
+      0.2,
+    )
+  }
+
+  const details = document.querySelector('.details')
+  if (details) {
+    timeline.to(
+      details,
+      {
+        x: window.innerWidth <= 600 ? '90%' : '60vw',
+        opacity: 0.8,
+        duration: 1,
+        ease: 'power3.in',
+        onComplete: () => {
+          showDetails.value = false
+          currentPainting.value = null
+        },
+      },
+      0.4,
+    )
+  }
+
   unFlipProduct()
   window.removeEventListener('mousemove', handleMouseMove)
 
-  const cross = paintingDetailsRef.value?.crossRef
+  const cross = document.querySelector('.cross')
   if (cross) {
     gsap.to(cross, {
       scale: 0,
-      duration: 0.4,
+      duration: 0.8,
       ease: 'power2.out',
     })
   }
-  showDetails.value = false
-  currentPainting.value = null
-
-  setTimeout(() => {
-    showDetails.value = false
-    currentPainting.value = null
-  }, 300)
 }
 
 const flipProduct = (clickedElement) => {
@@ -234,43 +328,69 @@ const unFlipProduct = () => {
 }
 
 // Animations functions
-const animateTexts = (paintingId) => {
-  const title = document.querySelector(`[data-title="${paintingId}"]`)
-  const description = document.querySelector(`[data-desc="${paintingId}"]`)
+const animateTexts = () => {
+  const title = document.querySelector('.details__title')
+  const description = document.querySelector('.details__body')
+  const thumb = document.querySelector('.details__thumb')
+
+  if (thumb) {
+    gsap.fromTo(
+      thumb,
+      {
+        scale: 0.95,
+        opacity: 0.7,
+      },
+      {
+        scale: 1,
+        opacity: 1,
+        duration: 1.4,
+        delay: 0.2,
+        ease: 'power3.out',
+      },
+    )
+  }
 
   if (title) {
-    const splitTitle = new SplitText(title, {
+    new SplitText(title, {
       type: 'lines, chars',
       charsClass: 'char',
     })
 
     gsap.fromTo(
       title.querySelectorAll('.char'),
-      { y: '100%' },
+      {
+        y: '100%',
+        opacity: 0,
+      },
       {
         y: 0,
-        duration: 1.1,
-        delay: 0.4,
-        ease: 'power3.inOut',
-        stagger: 0.025,
+        opacity: 1,
+        duration: 1.3,
+        delay: 0.5,
+        ease: 'power3.out',
+        stagger: 0.02,
       },
     )
   }
 
   if (description) {
-    const splitDesc = new SplitText(description, {
+    new SplitText(description, {
       type: 'lines',
       linesClass: 'line',
     })
     gsap.fromTo(
       description.querySelectorAll('.line'),
-      { y: '100%' },
+      {
+        y: '100%',
+        opacity: 0,
+      },
       {
         y: 0,
-        duration: 1.1,
-        delay: 0.6,
-        ease: 'power3.inOut',
-        stagger: 0.05,
+        opacity: 1,
+        duration: 1.2,
+        delay: 0.8,
+        ease: 'power3.out',
+        stagger: 0.08,
       },
     )
   }
@@ -279,7 +399,7 @@ const animateTexts = (paintingId) => {
 const handleMouseMove = (e) => {
   if (!showDetails.value) return
 
-  const cross = paintingDetailsRef.value?.crossRef
+  const cross = document.querySelector('.cross')
   if (!cross) return
 
   const x = e.clientX
@@ -364,5 +484,28 @@ onMounted(async () => {
   height: 100vh;
   top: 0;
   left: 0;
+
+  transform-origin: center center;
+  will-change: transform;
+}
+
+&:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: 2;
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 0.45s ease-in-out;
+}
+
+.line,
+.char {
+  transform: translate3d(0, 100%, 0);
 }
 </style>

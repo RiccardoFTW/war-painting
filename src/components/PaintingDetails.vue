@@ -22,7 +22,7 @@
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue'
 
-const props = defineProps({
+defineProps({
   isVisible: {
     type: Boolean,
     default: false,
@@ -34,15 +34,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+const crossRef = ref(null)
+const detailsRef = ref(null)
 
 const closeDetails = () => {
   emit('close')
 }
 
-const crossRef = ref(null)
-
 defineExpose({
   crossRef,
+  detailsRef,
 })
 </script>
 
@@ -53,19 +54,20 @@ defineExpose({
   right: 0;
   width: 50vw;
   height: 100vh;
-  background: #000;
-  color: white;
-  transform: translateX(60vw);
-  transition: transform 0.3s ease;
+  padding: 3vw 4vw;
+  background-color: #f1f1f1;
+  opacity: 1;
+  transform: translate3d(60vw, 0, 0);
   z-index: 9999;
+  will-change: transform;
 
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
-}
+  @media (max-width: 600px) {
+    width: 90%;
+    height: 100vh;
+    padding: 8vw 7vw;
 
-.details.--is-showing {
-  transform: translateX(0);
+    transform: translate3d(90%, 0, 0);
+  }
 }
 
 .details__thumb {
@@ -76,14 +78,30 @@ defineExpose({
 }
 
 .details__title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 4vw;
+  position: relative;
+  display: grid;
+
+  @media (max-width: 600px) {
+    margin-bottom: 8vw;
+  }
+
+  p {
+    grid-area: 1 / -1;
+    overflow: hidden;
+    font-size: 3vw;
+
+    @media (max-width: 600px) {
+      font-size: 2rem;
+    }
+  }
 }
 
 .details__body {
-  font-size: 1.2rem;
-  line-height: 1.6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 2vw;
 }
 
 .cross {
@@ -96,6 +114,7 @@ defineExpose({
   z-index: 10000;
   transform: scale(0);
   pointer-events: none;
+  background-color: red;
 }
 
 .cross span {
