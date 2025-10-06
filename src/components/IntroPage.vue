@@ -1,51 +1,57 @@
 <template>
   <div class="intro__container">
-    <div class="war__title">
-      <h1 class="war">
+    <h1 class="war">
+      <span>
+        <span>WAR</span>
+      </span>
+    </h1>
+    <div class="emotions__container">
+      <p>
         <span>
-          <span>war</span>
+          <span>GLORIOUS</span>
         </span>
-      </h1>
-    </div>
-
-    <div class="illustration__container">
-      <img
-        v-for="(image, index) in images"
-        :key="index"
-        :src="image.src"
-        :alt="image.alt"
-        class="warrior__image"
-        :class="{ 'is-visible': index <= currentImageIndex }"
-      />
-    </div>
-
-    <div class="war__description">
-      <p class="description__text">
+      </p>
+      <p>
         <span>
-          <span
-            >Organized, large-scale,armed conflict between countries or between national, ethnic, or
-            other sizeable groups, usually but not always involving active engagement of military
-            forces.</span
-          >
+          <span>APOCALYPTIC</span>
+        </span>
+      </p>
+      <p>
+        <span>
+          <span>BRUTAL</span>
+        </span>
+      </p>
+      <p>
+        <span>
+          <span>HEROIC</span>
+        </span>
+      </p>
+      <p>
+        <span>
+          <span>VISCERAL</span>
+        </span>
+      </p>
+      <p>
+        <span>
+          <span>FIERCE</span>
         </span>
       </p>
     </div>
+    <p class="description__text">
+      <span>
+        <span
+          >Organized, large-scale,armed conflict between countries or between national, ethnic, or
+          other sizeable groups, usually but not always involving active engagement of military
+          forces.</span
+        >
+      </span>
+    </p>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
-
-const images = ref([
-  { src: '/src/assets/img/intro-img/6.svg', alt: '6' },
-  { src: '/src/assets/img/intro-img/7.svg', alt: '7' },
-  { src: '/src/assets/img/intro-img/10.svg', alt: '10' },
-  { src: '/src/assets/img/intro-img/11.svg', alt: '11' },
-  { src: '/src/assets/img/intro-img/12.svg', alt: '12' },
-])
-
-const currentImageIndex = ref(-1)
 
 onMounted(async () => {
   await nextTick()
@@ -54,121 +60,113 @@ onMounted(async () => {
 
   tl.from('h1 span>span', {
     duration: 3,
-    y: 150,
-    autoAlpha: 0,
+    y: 200,
     ease: 'Power3.out',
     stagger: 1.5,
   })
     .from(
-      'p span>span',
+      '.description__text span>span',
       {
         duration: 2,
-        y: 150,
+        y: 50,
         autoAlpha: 0,
         ease: 'Power3.out',
-        stagger: 1.5,
       },
-      '+=0.04',
+      '+=0.1',
     )
 
-    .call(animateWarriorsSequentially, [], '+=2')
-})
-
-const animateWarriorsSequentially = () => {
-  const warriorImages = document.querySelectorAll('.warrior__image')
-
-  gsap.set(warriorImages, { opacity: 0, scale: 0.9 })
-
-  // Timeline infinita
-  const tl = gsap.timeline({
-    repeat: 1,
-    repeatDelay: 0.8, // Pausa di 800ms tra cicli
-  })
-
-  warriorImages.forEach((img, index) => {
-    // Appari
-    tl.to(
-      img,
+    .from(
+      '.emotions__container p span>span',
       {
-        opacity: 1,
-        scale: 1.5,
-        duration: 0.6,
-        ease: 'power3.out',
+        duration: 2,
+        y: 50,
+        autoAlpha: 0,
+        ease: 'Power3.out',
+        stagger: 0.8,
       },
-      index === 0 ? 0 : '+=0.2',
-    ) // Prima immagine subito, altre dopo 300ms
-
-      // Scompari
-      .to(
-        img,
-        {
-          opacity: 0,
-          scale: 0.8,
-          duration: 0.3,
-        },
-        '+=0.3',
-      )
-  })
-}
+      '+=0.8',
+    )
+})
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url(../assets/fonts/NeueMontreal-Regular.otf);
+}
+
+.top__voices {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  height: 20px;
+}
+
+.top__voices span {
+  font-family: 'Neue Montreal', serif;
+  color: #5d3136;
+  padding: 0 !important;
+  font-size: clamp(0.5rem, 1vw, 1rem);
+}
 
 .intro__container {
   position: fixed;
   height: 100vh;
   width: 100vw;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0 1vw;
-  gap: 7rem;
+  justify-content: space-between;
+  position: relative;
+}
+
+.intro__container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(../assets/img/intro-img/6.svg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .war {
-  font-family: 'Bebas Neue', serif;
-  font-size: clamp(3rem, 2vw, 8rem);
-  font-weight: 700;
-  color: firebrick;
-  margin: 0;
-  line-height: 1.5;
-  letter-spacing: -0.02em;
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-size: 128px;
+  color: #5d3136;
 }
 
 span {
   display: block;
   overflow: hidden;
+  padding: 1vw;
+  margin: 0 !important;
+}
+
+.emotions__container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 7rem;
+  font-family: 'Neue Montreal';
+  color: #5d3136;
 }
 
 .description__text {
-  font-family: 'Bebas Neue', serif;
-  font-size: clamp(1rem, 0.2vw, 1.3rem);
-  line-height: 1.4;
-  color: firebrick;
-  letter-spacing: -0.02em;
-  text-align: right;
-  max-width: 300px;
-}
-
-.illustration__container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 30vh;
-  width: 30vw;
-}
-
-.warrior__image {
-  position: absolute;
-  max-width: 40%;
-  max-height: 100%;
-  object-fit: contain;
-  opacity: 0;
-}
-
-.warrior__image.is-visible {
-  opacity: 1;
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: #5d3136;
+  text-align: center;
+  max-width: 1000px;
+  text-transform: uppercase;
 }
 </style>
