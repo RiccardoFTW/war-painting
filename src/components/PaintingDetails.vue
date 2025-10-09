@@ -71,10 +71,21 @@ defineExpose({
 }
 
 .details__thumb {
+  position: relative;
   width: 100%;
   height: 40vh;
   background: #111;
   margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+
+  img {
+    width: 18.5vw;
+    height: 18.5vw;
+    object-fit: contain;
+  }
 }
 
 .details__title {
@@ -102,6 +113,10 @@ defineExpose({
   flex-wrap: wrap;
   align-items: end;
   gap: 2vw;
+
+  p {
+    overflow: hidden;
+  }
 }
 
 .cross {
@@ -114,7 +129,6 @@ defineExpose({
   z-index: 10000;
   transform: scale(0);
   pointer-events: none;
-  background-color: red;
 }
 
 .cross span {

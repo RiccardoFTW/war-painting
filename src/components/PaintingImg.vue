@@ -32,9 +32,11 @@ const paintingRef = ref(null)
 
 const handleClick = (e) => {
   e.stopPropagation()
+  // Passa l'elemento img, non il contenitore
+  const imgElement = paintingRef.value?.querySelector('img')
   emit('click', {
     data: props.paintingData,
-    element: paintingRef.value,
+    element: imgElement || paintingRef.value,
   })
 }
 </script>

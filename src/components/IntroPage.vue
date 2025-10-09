@@ -90,28 +90,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
-
-@font-face {
-  font-family: 'Neue Montreal';
-  src: url(../assets/fonts/NeueMontreal-Regular.otf);
-}
-
-.top__voices {
-  display: flex;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  height: 20px;
-}
-
-.top__voices span {
-  font-family: 'Neue Montreal', serif;
-  color: #5d3136;
-  padding: 0 !important;
-  font-size: clamp(0.5rem, 1vw, 1rem);
-}
-
 .intro__container {
   position: fixed;
   height: 100vh;

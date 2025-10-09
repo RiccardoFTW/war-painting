@@ -38,6 +38,10 @@ const currentPainting = ref(null)
 const currentPaintingElement = ref(null)
 const originalParent = ref(null)
 
+// SplitText instances per cleanup
+let titleSplit = null
+let descSplit = null
+
 // FUNCTIONS
 
 // Grid Functions
@@ -178,18 +182,29 @@ const openDetails = (clickData) => {
 
   nextTick(() => {
     const details = document.querySelector('.details')
+    const title = document.querySelector('.details__title p')
+    const description = document.querySelector('.details__body p')
+    const cross = document.querySelector('.cross')
+
+    // Nascondi immediatamente testi prima delle animazioni
+    if (title) gsap.set(title, { opacity: 0 })
+    if (description) gsap.set(description, { opacity: 0 })
+    if (cross) gsap.set(cross, { scale: 1, opacity: 0 })
+
+    // Anima apertura pannello
     if (details) {
       gsap.fromTo(
         details,
         {
-          x: window.innerWidth <= 600 ? '90%' : '60vw',
-          opacity: 0.8,
+          x: window.innerWidth <= 600 ? '100%' : '60vw',
+          opacity: 0,
         },
         {
           x: 0,
           opacity: 1,
-          duration: 1.2,
-          ease: 'power3.out',
+          duration: 1.6,
+          ease: 'power4.out',
+          delay: 0.2,
         },
       )
     }
@@ -199,95 +214,104 @@ const openDetails = (clickData) => {
 
   setTimeout(() => {
     animateTexts(clickData.data.id)
-  }, 800)
+  }, 1200)
 
   window.addEventListener('mousemove', handleMouseMove)
-
-  nextTick(() => {
-    const cross = document.querySelector('.cross')
-    if (cross) {
-      gsap.set(cross, { scale: 1, opacity: 0 })
-    }
-  })
 }
 
 const closeDetails = () => {
-  const title = document.querySelector('.details__title')
-  const description = document.querySelector('.details__body')
-  const thumb = document.querySelector('.details__thumb')
+  const cross = document.querySelector('.cross')
 
   const timeline = gsap.timeline()
 
-  if (title && title.querySelectorAll('.char').length > 0) {
+  // Nascondi cross
+  if (cross) {
     timeline.to(
-      title.querySelectorAll('.char'),
+      cross,
       {
-        y: '-100%',
+        scale: 0,
         opacity: 0,
-        duration: 0.6,
-        ease: 'power3.in',
-        stagger: 0.01,
+        duration: 0.4,
+        ease: 'power2.in',
       },
       0,
     )
   }
 
-  if (description && description.querySelectorAll('.line').length > 0) {
+  // Nascondi testi usando i split salvati
+  if (titleSplit && titleSplit.chars) {
     timeline.to(
-      description.querySelectorAll('.line'),
+      titleSplit.chars,
       {
         y: '-100%',
         opacity: 0,
         duration: 0.5,
         ease: 'power3.in',
-        stagger: 0.03,
+        stagger: 0.008,
+      },
+      0,
+    )
+  }
+
+  if (descSplit && descSplit.lines) {
+    timeline.to(
+      descSplit.lines,
+      {
+        y: '-100%',
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power3.in',
+        stagger: 0.02,
       },
       0.1,
     )
   }
 
-  if (thumb) {
-    timeline.to(
-      thumb,
-      {
-        scale: 0.95,
-        opacity: 0.7,
-        duration: 0.8,
-        ease: 'power3.in',
-      },
-      0.2,
-    )
-  }
-
+  // Chiudi pannello
   const details = document.querySelector('.details')
   if (details) {
     timeline.to(
       details,
       {
-        x: window.innerWidth <= 600 ? '90%' : '60vw',
-        opacity: 0.8,
-        duration: 1,
-        ease: 'power3.in',
-        onComplete: () => {
-          showDetails.value = false
-          currentPainting.value = null
-        },
+        x: window.innerWidth <= 600 ? '100%' : '60vw',
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power4.in',
       },
-      0.4,
+      0.5,
     )
   }
 
-  unFlipProduct()
-  window.removeEventListener('mousemove', handleMouseMove)
+  // Unflip dopo che il pannello inizia a chiudersi
+  timeline.call(
+    () => {
+      unFlipProduct()
+    },
+    null,
+    0.6,
+  )
 
-  const cross = document.querySelector('.cross')
-  if (cross) {
-    gsap.to(cross, {
-      scale: 0,
-      duration: 0.8,
-      ease: 'power2.out',
-    })
-  }
+  // Cleanup finale
+  timeline.call(
+    () => {
+      // Pulisci i split
+      if (titleSplit) {
+        titleSplit.revert()
+        titleSplit = null
+      }
+      if (descSplit) {
+        descSplit.revert()
+        descSplit = null
+      }
+
+      showDetails.value = false
+      currentPainting.value = null
+    },
+    null,
+    1.8,
+  )
+
+  window.removeEventListener('mousemove', handleMouseMove)
 }
 
 const flipProduct = (clickedElement) => {
@@ -295,32 +319,49 @@ const flipProduct = (clickedElement) => {
 
   if (!detailsThumb || !clickedElement) return
 
+  // Salva riferimenti per il flip inverso
   currentPaintingElement.value = clickedElement
   originalParent.value = clickedElement.parentNode
 
+  // Cattura lo stato iniziale (posizione nella griglia)
   const state = Flip.getState(clickedElement)
 
+  // Imposta dimensioni fisse prima di spostare
+  gsap.set(clickedElement, {
+    width: '18.5vw',
+    height: '18.5vw',
+  })
+
+  // Sposta fisicamente l'immagine dentro il thumb
   detailsThumb.appendChild(clickedElement)
 
+  // Anima dalla posizione originale alla nuova posizione
   Flip.from(state, {
     absolute: true,
-    duration: 1.2,
+    duration: 1.4,
     ease: 'power3.inOut',
+    simple: true,
   })
 }
 
 const unFlipProduct = () => {
   if (!currentPaintingElement.value || !originalParent.value) return
 
+  // Cattura lo stato attuale (dentro il thumb)
   const state = Flip.getState(currentPaintingElement.value)
 
+  // Rimetti l'immagine nella posizione originale
   originalParent.value.appendChild(currentPaintingElement.value)
 
+  // Anima dal thumb alla posizione originale
   Flip.from(state, {
     absolute: true,
-    duration: 1.2,
+    duration: 1.4,
     ease: 'power3.inOut',
+    simple: true,
     onComplete: () => {
+      // Pulisci tutti gli stili inline aggiunti da GSAP
+      gsap.set(currentPaintingElement.value, { clearProps: 'all' })
       currentPaintingElement.value = null
       originalParent.value = null
     },
@@ -329,68 +370,63 @@ const unFlipProduct = () => {
 
 // Animations functions
 const animateTexts = () => {
-  const title = document.querySelector('.details__title')
-  const description = document.querySelector('.details__body')
-  const thumb = document.querySelector('.details__thumb')
+  const title = document.querySelector('.details__title p')
+  const description = document.querySelector('.details__body p')
 
-  if (thumb) {
-    gsap.fromTo(
-      thumb,
-      {
-        scale: 0.95,
-        opacity: 0.7,
-      },
-      {
-        scale: 1,
-        opacity: 1,
-        duration: 1.4,
-        delay: 0.2,
-        ease: 'power3.out',
-      },
-    )
-  }
+  // Pulisci eventuali split precedenti
+  if (titleSplit) titleSplit.revert()
+  if (descSplit) descSplit.revert()
 
   if (title) {
-    new SplitText(title, {
-      type: 'lines, chars',
+    // Rendi visibile il paragrafo prima di splittarlo
+    gsap.set(title, { opacity: 1 })
+
+    // Crea nuovo split e salvalo per cleanup futuro
+    titleSplit = new SplitText(title, {
+      type: 'chars',
       charsClass: 'char',
     })
 
     gsap.fromTo(
-      title.querySelectorAll('.char'),
+      titleSplit.chars,
       {
-        y: '100%',
+        y: '120%',
+        opacity: 0,
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1.4,
+        delay: 0.8,
+        ease: 'power4.out',
+        stagger: 0.015,
+      },
+    )
+  }
+
+  if (description) {
+    // Rendi visibile il paragrafo prima di splittarlo
+    gsap.set(description, { opacity: 1 })
+
+    // Crea nuovo split e salvalo per cleanup futuro
+    descSplit = new SplitText(description, {
+      type: 'lines',
+      linesClass: 'line',
+    })
+
+    gsap.fromTo(
+      descSplit.lines,
+      {
+        y: '120%',
         opacity: 0,
       },
       {
         y: 0,
         opacity: 1,
         duration: 1.3,
-        delay: 0.5,
-        ease: 'power3.out',
-        stagger: 0.02,
-      },
-    )
-  }
-
-  if (description) {
-    new SplitText(description, {
-      type: 'lines',
-      linesClass: 'line',
-    })
-    gsap.fromTo(
-      description.querySelectorAll('.line'),
-      {
-        y: '100%',
-        opacity: 0,
-      },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1.2,
-        delay: 0.8,
-        ease: 'power3.out',
-        stagger: 0.08,
+        delay: 1.1,
+        ease: 'power4.out',
+        stagger: 0.06,
       },
     )
   }
@@ -489,19 +525,20 @@ onMounted(async () => {
   will-change: transform;
 }
 
-&:before {
+.container::before {
   content: '';
-  position: absolute;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
-  z-index: 2;
+  background-image: url(../assets/img/intro-img/6.svg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  z-index: -1;
   pointer-events: none;
-
-  opacity: 0;
-  transition: opacity 0.45s ease-in-out;
 }
 
 .line,
