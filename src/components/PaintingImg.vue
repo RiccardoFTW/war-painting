@@ -32,7 +32,6 @@ const paintingRef = ref(null)
 
 const handleClick = (e) => {
   e.stopPropagation()
-  // Passa l'elemento img, non il contenitore
   const imgElement = paintingRef.value?.querySelector('img')
   emit('click', {
     data: props.paintingData,
@@ -47,9 +46,25 @@ const handleClick = (e) => {
   width: 18.5vw;
   aspect-ratio: 1 / 1;
 
+  @media (max-width: 1024px) {
+    width: 25vw;
+  }
+
+  @media (max-width: 768px) {
+    width: 45vw;
+  }
+
   div {
     width: 18.5vw;
     aspect-ratio: 1 / 1;
+
+    @media (max-width: 1024px) {
+      width: 25vw;
+    }
+
+    @media (max-width: 768px) {
+      width: 45vw;
+    }
   }
 
   img {

@@ -120,8 +120,12 @@ onMounted(async () => {
 .war {
   font-family: 'Instrument Serif', serif;
   font-weight: 400;
-  font-size: 128px;
+  font-size: clamp(3rem, 15vw, 128px);
   color: #5d3136;
+
+  @media (max-width: 768px) {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+  }
 }
 
 span {
@@ -129,14 +133,29 @@ span {
   overflow: hidden;
   padding: 1vw;
   margin: 0 !important;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
 }
 
 .emotions__container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(6, 1fr);
   gap: 7rem;
   font-family: 'Neue Montreal';
   color: #5d3136;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 0 1rem;
+  }
 }
 
 .description__text {
@@ -146,5 +165,15 @@ span {
   text-align: center;
   max-width: 1000px;
   text-transform: uppercase;
+
+  @media (max-width: 1024px) {
+    max-width: 800px;
+    padding: 0 2rem;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 1.5rem;
+  }
 }
 </style>

@@ -1,6 +1,10 @@
 <template>
   <div class="container" ref="containerRef" @click="handleContainerClick">
-    <MainGrid ref="mainGridRef" @painting-click="openDetails" />
+    <MainGrid
+      ref="mainGridRef"
+      :paintings="paintingsData.paintings"
+      @painting-click="openDetails"
+    />
 
     <PaintingDetails
       ref="paintingDetailsRef"
@@ -18,29 +22,49 @@ import MainGrid from './MainGrid.vue'
 import PaintingDetails from './PaintingDetails.vue'
 import { Draggable, Flip, SplitText } from 'gsap/all'
 import gsap from 'gsap'
+import paintingsData from '../data/paintings.json'
 
 // PLUGIN REGISTRATION
 gsap.registerPlugin(Draggable, Flip, SplitText)
 
 // REACTIVE STATE
-
-// Grid Refs
 const containerRef = ref(null)
 const mainGridRef = ref(null)
 const paintingDetailsRef = ref(null)
 
-// State management
 const isDragging = ref(false)
 const showDetails = ref(false)
 const currentPainting = ref(null)
+const isClosing = ref(false)
 
-// Flip animation state
 const currentPaintingElement = ref(null)
 const originalParent = ref(null)
+const originalGridPosition = ref({ x: 0, y: 0 })
 
-// SplitText instances per cleanup
 let titleSplit = null
 let descSplit = null
+
+// RESPONSIVE HELPER FUNCTIONS
+const isMobile = () => window.innerWidth <= 768
+const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
+
+const getDetailsPanelWidth = () => {
+  if (isMobile()) return '100%'
+  if (isTablet()) return '60vw'
+  return '50vw'
+}
+
+const getGridShift = () => {
+  if (isMobile()) return '-=20vw'
+  if (isTablet()) return '-=40vw'
+  return '-=50vw'
+}
+
+const getPanelBoundary = () => {
+  if (isMobile()) return window.innerWidth * 0.8
+  if (isTablet()) return window.innerWidth * 0.6
+  return window.innerWidth * 0.5
+}
 
 // FUNCTIONS
 
@@ -90,19 +114,26 @@ const intro = async () => {
     opacity: 1,
     duration: 0.6,
     ease: 'power3.out',
-    stagger: { amount: 1.2, from: 'random' },
-  })
-
-  timeline.to(containerRef.value, {
-    scale: 1,
-    duration: 1.2,
-    ease: 'power3.inOut',
-    onComplete: () => {
-      if (details) {
-        gsap.set(details, { opacity: 1 })
-      }
+    stagger: {
+      amount: 1.2,
+      from: 'random',
     },
   })
+
+  timeline.to(
+    containerRef.value,
+    {
+      scale: 1,
+      duration: 1.2,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        if (details) {
+          gsap.set(details, { opacity: 1 })
+        }
+      },
+    },
+    '+=0.3',
+  )
 }
 
 // Drag functions
@@ -138,10 +169,10 @@ const addScrollListener = () => {
     const grid = mainGridRef.value?.gridRef
     if (!grid) return
 
-    if (showDetails.value) return
+    if (showDetails.value || isClosing.value) return
 
-    const deltaX = -e.deltaX * 7
-    const deltaY = -e.deltaY * 7
+    const deltaX = -e.deltaX * 3
+    const deltaY = -e.deltaY * 3
 
     const currentX = gsap.getProperty(grid, 'x')
     const currentY = gsap.getProperty(grid, 'y')
@@ -180,30 +211,44 @@ const openDetails = (clickData) => {
   currentPainting.value = clickData.data
   showDetails.value = true
 
+  const grid = mainGridRef.value?.gridRef
+  if (grid) {
+    originalGridPosition.value = {
+      x: gsap.getProperty(grid, 'x'),
+      y: gsap.getProperty(grid, 'y'),
+    }
+  }
+
   nextTick(() => {
     const details = document.querySelector('.details')
     const title = document.querySelector('.details__title p')
     const description = document.querySelector('.details__body p')
     const cross = document.querySelector('.cross')
+    const grid = mainGridRef.value?.gridRef
 
-    // Nascondi immediatamente testi prima delle animazioni
     if (title) gsap.set(title, { opacity: 0 })
     if (description) gsap.set(description, { opacity: 0 })
     if (cross) gsap.set(cross, { scale: 1, opacity: 0 })
 
-    // Anima apertura pannello
+    if (grid) {
+      gsap.to(grid, {
+        x: getGridShift(),
+        duration: 2,
+        ease: 'power2.out',
+        delay: 0.1,
+      })
+    }
+
     if (details) {
       gsap.fromTo(
         details,
         {
-          x: window.innerWidth <= 600 ? '100%' : '60vw',
-          opacity: 0,
+          x: getDetailsPanelWidth(),
         },
         {
           x: 0,
-          opacity: 1,
           duration: 1.6,
-          ease: 'power4.out',
+          ease: 'power3.out',
           delay: 0.2,
         },
       )
@@ -220,11 +265,13 @@ const openDetails = (clickData) => {
 }
 
 const closeDetails = () => {
+  isClosing.value = true
+
   const cross = document.querySelector('.cross')
+  const grid = mainGridRef.value?.gridRef
 
   const timeline = gsap.timeline()
 
-  // Nascondi cross
   if (cross) {
     timeline.to(
       cross,
@@ -238,7 +285,6 @@ const closeDetails = () => {
     )
   }
 
-  // Nascondi testi usando i split salvati
   if (titleSplit && titleSplit.chars) {
     timeline.to(
       titleSplit.chars,
@@ -267,22 +313,35 @@ const closeDetails = () => {
     )
   }
 
-  // Chiudi pannello
+  if (grid) {
+    const currentX = gsap.getProperty(grid, 'x')
+    const shiftMultiplier = isMobile() ? 0.2 : isTablet() ? 0.4 : 0.5
+    const targetX = currentX + window.innerWidth * shiftMultiplier
+
+    timeline.to(
+      grid,
+      {
+        x: targetX,
+        duration: 1.2,
+        ease: 'power3.inOut',
+      },
+      0.3,
+    )
+  }
+
   const details = document.querySelector('.details')
   if (details) {
     timeline.to(
       details,
       {
-        x: window.innerWidth <= 600 ? '100%' : '60vw',
-        opacity: 0,
+        x: getDetailsPanelWidth(),
         duration: 1.2,
-        ease: 'power4.in',
+        ease: 'power3.inOut',
       },
-      0.5,
+      0.3,
     )
   }
 
-  // Unflip dopo che il pannello inizia a chiudersi
   timeline.call(
     () => {
       unFlipProduct()
@@ -291,10 +350,8 @@ const closeDetails = () => {
     0.6,
   )
 
-  // Cleanup finale
   timeline.call(
     () => {
-      // Pulisci i split
       if (titleSplit) {
         titleSplit.revert()
         titleSplit = null
@@ -306,6 +363,7 @@ const closeDetails = () => {
 
       showDetails.value = false
       currentPainting.value = null
+      isClosing.value = false
     },
     null,
     1.8,
@@ -319,23 +377,18 @@ const flipProduct = (clickedElement) => {
 
   if (!detailsThumb || !clickedElement) return
 
-  // Salva riferimenti per il flip inverso
   currentPaintingElement.value = clickedElement
   originalParent.value = clickedElement.parentNode
 
-  // Cattura lo stato iniziale (posizione nella griglia)
   const state = Flip.getState(clickedElement)
 
-  // Imposta dimensioni fisse prima di spostare
-  gsap.set(clickedElement, {
-    width: '18.5vw',
-    height: '18.5vw',
-  })
-
-  // Sposta fisicamente l'immagine dentro il thumb
   detailsThumb.appendChild(clickedElement)
 
-  // Anima dalla posizione originale alla nuova posizione
+  gsap.set(clickedElement, {
+    width: '100%',
+    height: '100%',
+  })
+
   Flip.from(state, {
     absolute: true,
     duration: 1.4,
@@ -347,41 +400,35 @@ const flipProduct = (clickedElement) => {
 const unFlipProduct = () => {
   if (!currentPaintingElement.value || !originalParent.value) return
 
-  // Cattura lo stato attuale (dentro il thumb)
   const state = Flip.getState(currentPaintingElement.value)
 
-  // Rimetti l'immagine nella posizione originale
   originalParent.value.appendChild(currentPaintingElement.value)
 
-  // Anima dal thumb alla posizione originale
   Flip.from(state, {
     absolute: true,
     duration: 1.4,
     ease: 'power3.inOut',
     simple: true,
     onComplete: () => {
-      // Pulisci tutti gli stili inline aggiunti da GSAP
-      gsap.set(currentPaintingElement.value, { clearProps: 'all' })
+      gsap.set(currentPaintingElement.value, {
+        clearProps: 'all',
+      })
       currentPaintingElement.value = null
       originalParent.value = null
     },
   })
 }
 
-// Animations functions
 const animateTexts = () => {
   const title = document.querySelector('.details__title p')
   const description = document.querySelector('.details__body p')
 
-  // Pulisci eventuali split precedenti
   if (titleSplit) titleSplit.revert()
   if (descSplit) descSplit.revert()
 
   if (title) {
-    // Rendi visibile il paragrafo prima di splittarlo
     gsap.set(title, { opacity: 1 })
 
-    // Crea nuovo split e salvalo per cleanup futuro
     titleSplit = new SplitText(title, {
       type: 'chars',
       charsClass: 'char',
@@ -405,10 +452,8 @@ const animateTexts = () => {
   }
 
   if (description) {
-    // Rendi visibile il paragrafo prima di splittarlo
     gsap.set(description, { opacity: 1 })
 
-    // Crea nuovo split e salvalo per cleanup futuro
     descSplit = new SplitText(description, {
       type: 'lines',
       linesClass: 'line',
@@ -441,7 +486,7 @@ const handleMouseMove = (e) => {
   const x = e.clientX
   const y = e.clientY
 
-  const isInPanel = x > window.innerWidth / 2
+  const isInPanel = x > getPanelBoundary()
 
   if (isInPanel) {
     gsap.to(cross, {
@@ -460,7 +505,7 @@ const handleMouseMove = (e) => {
 }
 
 const handleContainerClick = (e) => {
-  if (showDetails.value && e.clientX < window.innerWidth / 2) {
+  if (showDetails.value && e.clientX < getPanelBoundary()) {
     closeDetails()
   }
 }

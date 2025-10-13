@@ -52,25 +52,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import gsap from 'gsap'
+import paintingsData from '../data/paintings.json'
 
-const images = ref([
-  { src: new URL('../assets/img/nw-01.png', import.meta.url).href, alt: 'immagine 1' },
-  { src: new URL('../assets/img/nw-02.png', import.meta.url).href, alt: 'immagine 2' },
-  { src: new URL('../assets/img/nw-03.png', import.meta.url).href, alt: 'immagine 3' },
-  { src: new URL('../assets/img/nw-05.png', import.meta.url).href, alt: 'immagine 4' },
-  { src: new URL('../assets/img/nw-06.png', import.meta.url).href, alt: 'immagine 5' },
-  { src: new URL('../assets/img/nw-07.png', import.meta.url).href, alt: 'immagine 6' },
-  { src: new URL('../assets/img/nw-08.png', import.meta.url).href, alt: 'immagine 7' },
-  { src: new URL('../assets/img/nw-09.png', import.meta.url).href, alt: 'immagine 8' },
-  { src: new URL('../assets/img/nw-10.png', import.meta.url).href, alt: 'immagine 9' },
-  { src: new URL('../assets/img/nw-11.png', import.meta.url).href, alt: 'immagine 10' },
-  { src: new URL('../assets/img/nw-12.png', import.meta.url).href, alt: 'immagine 11' },
-])
+const images = computed(() => {
+  const shuffled = [...paintingsData.paintings].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, 25).map((painting) => {
+    const imageName = painting.image.split('/').pop()
+    return {
+      src: new URL(`../assets/img/paintings/${imageName}`, import.meta.url).href,
+      alt: painting.title,
+    }
+  })
+})
 
 let imgNum = 0
-const threshold = 150 // Ridotto per rendere l'effetto più frequente e fluido
 let lastPosX = 0
 let lastPosY = 0
 let isCounting = true
@@ -78,9 +75,26 @@ let startFromX = 0
 let startFromY = 0
 let allImages = []
 
+// RESPONSIVE HELPERS
+const isMobile = () => window.innerWidth <= 768
+const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
+
+const getThreshold = () => {
+  if (isMobile()) return 80
+  if (isTablet()) return 120
+  return 150
+}
+
+const getImageScale = () => {
+  if (isMobile()) return 1.2
+  if (isTablet()) return 1.3
+  return 1.4
+}
+
 const handleMouseMove = (e) => {
   const x = e.clientX
   const y = e.clientY
+  const threshold = getThreshold()
 
   const hasCrossedThreshold =
     x > startFromX + threshold ||
@@ -120,10 +134,10 @@ const showNextImage = (e) => {
   const tl = gsap.timeline()
 
   tl.to(movingImage, {
-    opacity: 1,
-    duration: 0.6, // Più veloce per apparire
-    scale: 1.4, // Leggermente più piccolo
-    ease: 'power3.out', // Easing più fluido
+    opacity: 0.8,
+    duration: 0.6,
+    scale: getImageScale(),
+    ease: 'power3.out',
   })
 
   tl.to(
@@ -131,8 +145,8 @@ const showNextImage = (e) => {
     {
       left: lastPosX + movingDistanceX,
       top: lastPosY + movingDistanceY,
-      duration: 1.5, // Più lungo per movimento più fluido
-      ease: 'power1.out', // Easing più fluido e graduale
+      duration: 1.5,
+      ease: 'power1.out',
     },
     '-=0.4',
   )
@@ -141,8 +155,8 @@ const showNextImage = (e) => {
     movingImage,
     {
       opacity: 0,
-      duration: 0.8, // Fade out più graduale
-      ease: 'power1.inOut', // Easing più fluido
+      duration: 0.8,
+      ease: 'power1.inOut',
     },
     '+=0.3',
   )
@@ -226,6 +240,17 @@ onUnmounted(() => {
   font-family: 'Neue Montreal';
   color: blue;
   font-size: clamp(0.8rem, 1.2vw, 1rem);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 0 1rem;
+  }
 }
 
 .about__container {
@@ -254,5 +279,13 @@ onUnmounted(() => {
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%);
+
+  @media (max-width: 1024px) {
+    width: 150px;
+  }
+
+  @media (max-width: 768px) {
+    width: 100px;
+  }
 }
 </style>

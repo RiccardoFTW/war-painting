@@ -1,175 +1,229 @@
 {
-    "paintings": [
-        {
-            "id": 1,
-            "title": "The surrender of Breda",
-            "artist": "Diego Velàzquez",
-            "year": 1635,
-            "description": "The siege of Breda of 1624–1625 occurred during the Eighty Years' War and was carried out by the Army of Flanders. The siege resulted in the fortified city of Breda passing from the control of the Dutch Republic to that of the Habsburg Netherlands.",
-            "Location": "Museo del Prado, Madrid",
-            "image": "../assets/img/paintings/01-surrender-of-breda.jpg"
-        },
-        {
-            "id": 2,
-            "title": "Dutch Ships Ramming Spanish Galleys off the Flemish Coast in October 1602",
-            "artist": "Hendrick Vroom",
-            "year": 1617,
-            "description": "An imposing Dutch ship under full sail, proudly flying the Dutch tricolour and the flag of the States-General, runs down two Spanish galley. Depicted is a naval engagement, the Battle of the Dover Straits, which had unfolded in the Channel on 3 October 1602.",
-            "Location": "Rijks Museum, Amsterdam",
-            "image": "../assets/img/paintings/02-dutch-ships-ramming-spanish-galleys.jpg"
-        },
-        {
-            "id": 3,
-            "title": "The Death of Major Peirson",
-            "artist": "John Singleton Copley",
-            "year": 1783,
-            "description": "The death of Major Francis Peirson at the Battle of Jersey on 6 January 1781, part of the Anglo-French War (1778–1783).",
-            "Location": "Jersey Museum and Art Gallery, Jersey",
-            "image":"../assets/img/paintings/03-the-death-of-major-peirson.jpg"
-        },
-        {
-            "id": 4,
-            "title": "The Charging Chasseur",
-            "artist":"Théodore Géricault ",
-            "year": 1812,
-            "description": "Mounted Napoleonic cavalry officer who is ready to attack.",
-            "Location": "Musèe du Louvre, Paris",
-            "image":"../assets/img/paintings/04-charging-chasseur.jpg"
-        },
-        {
-            "id": 5,
-            "title": "The Battle of Grunwald",
-            "artist": "Jan Matejko",
-            "year": 1878,
-            "description": "The Battle of Grunwald, the victory of the allied Crown of the Kingdom of Poland and Grand Duchy of Lithuania over the Teutonic Order in 1410.",
-            "Location": "National Museum, Warsaw",
-            "image": "../assets/img/paintings/05-the-battle-of-grunwald.jpg"
-        }, 
-        {
-            "id": 6,
-            "title": "Battle of Çeşme at Night",
-            "artist": "Ivan Aivazovsky",
-            "year": 1848,
-            "description": "Chesme battle in the night of June 25-26, 1770",
-            "Location": "Aivazovsky National Art Gallery, Ukraine",
-            "image": ""
-        },
-        {
-            "id": 7,
-            "title": "Stormtroopers Advancing under Gas",
-            "artist": "Otto Dix",
-            "year": 1924,
-            "description": "The engraving represents five German stormtroopers, recognizable by their steel helmets, all wearing gas masks, as they are advancing into enemy lines, while suffering a gas attack.",
-            "Location": "Otto Dix Haus, Germany",
-            "image": "",
-        }, 
-        {
-            "id": 8,
-            "title": "The Portrait of a Sergeant",
-            "artist": "Jean-Louis-Ernest Meissonier",
-            "year": 1874,
-            "description": "Artist portraying a sergeant during Napoleonic Wars",
-            "Location": "Jean-Louis-Ernest Meissonier's studio, Private Collection",
-            "image": ""
-        },
-        {
-            "id": 9,
-            "title": "Campagne de France",
-            "artist": "Jean-Louis-Ernest Meissonier",
-            "year": 1864,
-            "description": "Napoleon and his staff are retuning from Soissons after the battle of Laon.",
-            "Location": "Musée d'Orsay, Paris",
-            "image": ""
-        },
-        {
-            "id": 10,
-            "title": "Scotland Forever!",
-            "artist": "Elizabeth Thompson",
-            "year": 1881,
-            "description": "The start of the cavalry charge of the Royal Scots Greys who charged alongside the British heavy cavalry at the Battle of Waterloo in 1815 during the Napoleonic wars.",
-            "Location": "Leeds Art Gallery, Leeds",
-            "image": ""
-        },
-        {
-            "id": 11,
-            "title": "Vuelvan Caras at the Battle of Las Queseras del Medio",
-            "artist": "Arturo Michelena",
-            "year": 1890,
-            "description": "The Battle of Las Quesaras del Medio was a crucial battle in the Venezuelan War of Independence.",
-            "Location": "Museo de Bellas Artes, Caracas",
-            "image": ""
-        }, 
-        {
-            "id": 12,
-            "title": "Rocroi, el último tercio",
-            "artist": "Augusto Ferrer-Dalmau",
-            "year": 2011,
-            "description": "The Battle of Rocroi (1643), a decisive clash between the Spanish and French armies, notable as one of the last stands of the legendary Spanish “tercios” (infantry units).",
-            "Location": "Private Collection",
-            "image": ""
-        },
-        {
-            "id": 13,
-            "title": "The Last Stand of the 44th Regiment at Gundamuck, 1842.",
-            "artist": "William Barnes Wollen",
-            "year": 1898,
-            "description": "The final defense of the surviving soldiers of Her Majesty’s 44th Regiment at Gandamak in 1842.",
-            "Location": "Chelmsford Museum, Chelmsford",
-            "image": ""
-        },
-        {
-            "id": 14 ,
-            "title":"The Battle of Alexander at Issus",
-            "artist":"Albrecht Altdorfer",
-            "year": 1529,
-            "description":"The painting portrays the 333 BC Battle of Issus, in which Alexander the Great secured a decisive victory over Darius III of Persia and gained crucial leverage in his campaign against the Persian Empire.",
-            "Location": "Alte Pinakothek, Munich",
-            "image": ""
-        },
-        {
-            "id": 15,
-            "title": "The Revolt of Cairo",
-            "artist": "Anne-Louis Girodet de Roussy-Trioson",
-            "year": 1810,
-            "description": "The Revolt of Cairo that took place on 21 October 1798 during the French Invasion of Egypt under General Napoleon Bonaparte.",
-            "Location": "Palace of Versailles, Versailles",
-            "image": ""
-        },
-        {
-            "id": 16,
-            "title":"Washington Crossing the Delaware",
-            "artist": "Emanuel Leutze",
-            "year": 1851,
-            "description": "General George Washington's crossing of the Delaware River with the Continental Army on the night of December 25–26, 1776, during the American Revolutionary War",
-            "Location": "Metropolitan Museum of Art, New York,",
-            "image": ""
-        },
-        {
-            "id": 17,
-            "title": "Carica di Lancieri" ,
-            "artist": "Umberto Boccioni",
-            "year": 1915,
-            "description":"The dramatic moment of a cavalry charge during wartime.",
-            "Location": "Museo del Novecento, Milan",
-            "image": "",
-        },
-        {
-            "id": ,
-            "title": ,
-            "artist":,
-            "year": ,
-            "description": ,
-            "Location":,
-            "image": ""
-        }
-        {
-            "id": ,
-            "title": ,
-            "artist":,
-            "year": ,
-            "description": ,
-            "Location":,
-            "image": ""
-        }
-    ]
+  "paintings": [
+    {
+      "id": 1,
+      "title": "The surrender of Breda",
+      "artist": "Diego Velàzquez",
+      "year": 1635,
+      "description": "The siege of Breda of 1624–1625 occurred during the Eighty Years' War and was carried out by the Army of Flanders. The siege resulted in the fortified city of Breda passing from the control of the Dutch Republic to that of the Habsburg Netherlands.",
+      "Location": "Museo del Prado, Madrid",
+      "image": "../assets/img/paintings/01.webp"
+    },
+    {
+      "id": 2,
+      "title": "Dutch Ships Ramming Spanish Galleys off the Flemish Coast in October 1602",
+      "artist": "Hendrick Vroom",
+      "year": 1617,
+      "description": "An imposing Dutch ship under full sail, proudly flying the Dutch tricolour and the flag of the States-General, runs down two Spanish galley. Depicted is a naval engagement, the Battle of the Dover Straits, which had unfolded in the Channel on 3 October 1602.",
+      "Location": "Rijks Museum, Amsterdam",
+      "image": "../assets/img/paintings/02.webp"
+    },
+    {
+      "id": 3,
+      "title": "The Death of Major Peirson",
+      "artist": "John Singleton Copley",
+      "year": 1783,
+      "description": "The death of Major Francis Peirson at the Battle of Jersey on 6 January 1781, part of the Anglo-French War (1778–1783).",
+      "Location": "Jersey Museum and Art Gallery, Jersey",
+      "image": "../assets/img/paintings/03.webp"
+    },
+    {
+      "id": 4,
+      "title": "The Charging Chasseur",
+      "artist": "Théodore Géricault ",
+      "year": 1812,
+      "description": "Mounted Napoleonic cavalry officer who is ready to attack.",
+      "Location": "Musèe du Louvre, Paris",
+      "image": "../assets/img/paintings/04.webp"
+    },
+    {
+      "id": 5,
+      "title": "The Battle of Grunwald",
+      "artist": "Jan Matejko",
+      "year": 1878,
+      "description": "The Battle of Grunwald, the victory of the allied Crown of the Kingdom of Poland and Grand Duchy of Lithuania over the Teutonic Order in 1410.",
+      "Location": "National Museum, Warsaw",
+      "image": "../assets/img/paintings/05.webp"
+    },
+    {
+      "id": 6,
+      "title": "Battle of Çeşme at Night",
+      "artist": "Ivan Aivazovsky",
+      "year": 1848,
+      "description": "Chesme battle in the night of June 25-26, 1770",
+      "Location": "Aivazovsky National Art Gallery, Ukraine",
+      "image": "../assets/img/paintings/06.webp"
+    },
+    {
+      "id": 7,
+      "title": "Stormtroopers Advancing under Gas",
+      "artist": "Otto Dix",
+      "year": 1924,
+      "description": "The engraving represents five German stormtroopers, recognizable by their steel helmets, all wearing gas masks, as they are advancing into enemy lines, while suffering a gas attack.",
+      "Location": "Otto Dix Haus, Germany",
+      "image": "../assets/img/paintings/07.webp"
+    },
+    {
+      "id": 8,
+      "title": "The Portrait of a Sergeant",
+      "artist": "Jean-Louis-Ernest Meissonier",
+      "year": 1874,
+      "description": "Artist portraying a sergeant during Napoleonic Wars",
+      "Location": "Jean-Louis-Ernest Meissonier's studio, Private Collection",
+      "image": "../assets/img/paintings/08.webp"
+    },
+    {
+      "id": 9,
+      "title": "Campagne de France",
+      "artist": "Jean-Louis-Ernest Meissonier",
+      "year": 1864,
+      "description": "Napoleon and his staff are retuning from Soissons after the battle of Laon.",
+      "Location": "Musée d'Orsay, Paris",
+      "image": "../assets/img/paintings/09.webp"
+    },
+    {
+      "id": 10,
+      "title": "Scotland Forever!",
+      "artist": "Elizabeth Thompson",
+      "year": 1881,
+      "description": "The start of the cavalry charge of the Royal Scots Greys who charged alongside the British heavy cavalry at the Battle of Waterloo in 1815 during the Napoleonic wars.",
+      "Location": "Leeds Art Gallery, Leeds",
+      "image": "../assets/img/paintings/10.webp"
+    },
+    {
+      "id": 11,
+      "title": "Vuelvan Caras at the Battle of Las Queseras del Medio",
+      "artist": "Arturo Michelena",
+      "year": 1890,
+      "description": "The Battle of Las Quesaras del Medio was a crucial battle in the Venezuelan War of Independence.",
+      "Location": "Museo de Bellas Artes, Caracas",
+      "image": "../assets/img/paintings/11.webp"
+    },
+    {
+      "id": 12,
+      "title": "Rocroi, el último tercio",
+      "artist": "Augusto Ferrer-Dalmau",
+      "year": 2011,
+      "description": "The Battle of Rocroi (1643), a decisive clash between the Spanish and French armies, notable as one of the last stands of the legendary Spanish “tercios” (infantry units).",
+      "Location": "Private Collection",
+      "image": "../assets/img/paintings/12.webp"
+    },
+    {
+      "id": 13,
+      "title": "The Last Stand of the 44th Regiment at Gundamuck, 1842.",
+      "artist": "William Barnes Wollen",
+      "year": 1898,
+      "description": "The final defense of the surviving soldiers of Her Majesty’s 44th Regiment at Gandamak in 1842.",
+      "Location": "Chelmsford Museum, Chelmsford",
+      "image": "../assets/img/paintings/13.webp"
+    },
+    {
+      "id": 14,
+      "title": "The Battle of Alexander at Issus",
+      "artist": "Albrecht Altdorfer",
+      "year": 1529,
+      "description": "The painting portrays the 333 BC Battle of Issus, in which Alexander the Great secured a decisive victory over Darius III of Persia and gained crucial leverage in his campaign against the Persian Empire.",
+      "Location": "Alte Pinakothek, Munich",
+      "image": "../assets/img/paintings/14.webp"
+    },
+    {
+      "id": 15,
+      "title": "The Revolt of Cairo",
+      "artist": "Anne-Louis Girodet de Roussy-Trioson",
+      "year": 1810,
+      "description": "The Revolt of Cairo that took place on 21 October 1798 during the French Invasion of Egypt under General Napoleon Bonaparte.",
+      "Location": "Palace of Versailles, Versailles",
+      "image": "../assets/img/paintings/15.webp"
+    },
+    {
+      "id": 16,
+      "title": "Washington Crossing the Delaware",
+      "artist": "Emanuel Leutze",
+      "year": 1851,
+      "description": "General George Washington's crossing of the Delaware River with the Continental Army on the night of December 25–26, 1776, during the American Revolutionary War",
+      "Location": "Metropolitan Museum of Art, New York,",
+      "image": "../assets/img/paintings/16.webp"
+    },
+    {
+      "id": 17,
+      "title": "Carica di Lancieri",
+      "artist": "Umberto Boccioni",
+      "year": 1915,
+      "description": "The dramatic moment of a cavalry charge during wartime.",
+      "Location": "Museo del Novecento, Milan",
+      "image": "../assets/img/paintings/17.webp"
+    },
+    {
+      "id": 18,
+      "title": "The Death of General Wolfe",
+      "artist": "Benjamin West",
+      "year": 1770,
+      "description": "Commemorating the 1759 Battle of Quebec, where General James Wolfe died at the moment of victory.",
+      "Location": "National Gallery of Canada, Ottawa",
+      "image": "../assets/img/paintings/18.webp"
+    },
+    {
+      "id": 19,
+      "title": "The Battle of La Hogue",
+      "artist": "Benjamin West",
+      "year": 1778,
+      "description": "Fought off the coast of Normandy the battle was decisive victory for the Royal Navy and its Dutch allies, thwarting an expected French invasion of England.",
+      "Location": "National Gallery of Art, Washington",
+      "image": "../assets/img/paintings/19.webp"
+    },
+    {
+      "id": 20,
+      "title": "The Battle of Quiberon Bay,",
+      "artist": "Dominic Serres",
+      "year": 1779,
+      "description": "The Battle of Quiberon Bay, on 20 November 1759, was the most decisive naval encounter during the Seven Years War, 1756-63, a conflict involving the major European colonial powers and fought around the globe.",
+      "Location": "National Maritime Museum, Greenwich",
+      "image": "../assets/img/paintings/20.webp"
+    },
+    {
+      "id": 21,
+      "title": "Edward III Crossing The Somme",
+      "artist": "Benjamin West",
+      "year": 1787,
+      "description": "The scene shows a mounted Edward III leading his army across the River Somme in Northern France shortly before the Battle of Crécy in 1346 during the Hundred Years War.",
+      "Location": "Royal Collection, Windsor Castle",
+      "image": "../assets/img/paintings/21.webp"
+    },
+    {
+      "id": 22,
+      "title": "The Last Grenadier of Waterloo",
+      "artist": "Horace Vernet",
+      "year": 1862,
+      "description": "A last grenadier on the battlefield of Waterloo, 1815.",
+      "Location": "Private Collection",
+      "image": "../assets/img/paintings/22.webp"
+    },
+    {
+      "id": 23,
+      "title": "The Battle of Jena",
+      "artist": "Horace Vernet",
+      "year": 1836,
+      "description": "It depicts the Battle of Jena fought on 14 October 1806. It portrays the French Emperor Napoleon on the field at Jena, one of his greatest victories during the Napoleonic Wars where he routed a Prussian force.",
+      "Location": "Palace of Versailles, Versailles",
+      "image": "../assets/img/paintings/23.webp"
+    },
+    {
+      "id": 24,
+      "title": "Battle of Moscow, 7th September 1812",
+      "artist": "Louis-François, Baron Lejeune ",
+      "year": 1822,
+      "description": "Louis-François Lejeune's painting of the Battle of Borodino, also known as the Battle of the Moskva, is a masterpiece created by the artist-general who fought in the battle.",
+      "Location": "Palace of Versailles, Versailles",
+      "image": "../assets/img/paintings/24.webp"
+    },
+    {
+      "id": 25,
+      "title": "Lannes' death at Essling",
+      "artist": "Paul-Émile Boutigny",
+      "year": 1894,
+      "description": "Lannes mortally wounded at Essling",
+      "Location": " Musée des Beaux-Arts, France",
+      "image": "../assets/img/paintings/25.webp"
+    }
+  ]
 }
