@@ -1,54 +1,9 @@
 <template>
-  <Transition :css="false" @enter="onEnter" @leave="onLeave" mode="out-in">
-    <IntroPage v-if="currentScene === 'intro'" key="intro" @complete="goToHero" />
-    <HeroPage v-else-if="currentScene === 'hero'" key="hero" @complete="goToMain" />
-    <MainContainer v-else-if="currentScene === 'main'" key="main" />
-  </Transition>
+  <IntroPage />
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import gsap from 'gsap'
 import IntroPage from './components/IntroPage.vue'
-import HeroPage from './components/HeroPage.vue'
-import MainContainer from './components/MainContainer.vue'
-
-// STATO: quale scena è attualmente visibile
-const currentScene = ref('intro')
-
-// FUNZIONI DI NAVIGAZIONE
-const goToHero = () => {
-  currentScene.value = 'hero'
-}
-
-const goToMain = () => {
-  currentScene.value = 'main'
-}
-
-// ANIMAZIONI DI TRANSIZIONE GSAP
-const onEnter = (el, done) => {
-  // Animazione di entrata: fade in
-  gsap.fromTo(
-    el,
-    { opacity: 0 },
-    {
-      opacity: 1,
-      duration: 1.2,
-      ease: 'power2.inOut',
-      onComplete: done,
-    },
-  )
-}
-
-const onLeave = (el, done) => {
-  // Animazione di uscita: fade out
-  gsap.to(el, {
-    opacity: 0,
-    duration: 1,
-    ease: 'power2.inOut',
-    onComplete: done,
-  })
-}
 </script>
 
 <style>

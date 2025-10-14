@@ -5,48 +5,48 @@
         <span>WAR</span>
       </span>
     </h1>
-    <div class="emotions__container">
-      <p>
-        <span>
-          <span>GLORIOUS</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>APOCALYPTIC</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>BRUTAL</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>HEROIC</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>VISCERAL</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>FIERCE</span>
-        </span>
-      </p>
-    </div>
-    <p class="description__text">
+  </div>
+  <div class="emotions__container">
+    <p>
       <span>
-        <span
-          >Organized, large-scale,armed conflict between countries or between national, ethnic, or
-          other sizeable groups, usually but not always involving active engagement of military
-          forces.</span
-        >
+        <span>GLORIOUS</span>
+      </span>
+    </p>
+    <p>
+      <span>
+        <span>APOCALYPTIC</span>
+      </span>
+    </p>
+    <p>
+      <span>
+        <span>BRUTAL</span>
+      </span>
+    </p>
+    <p>
+      <span>
+        <span>HEROIC</span>
+      </span>
+    </p>
+    <p>
+      <span>
+        <span>VISCERAL</span>
+      </span>
+    </p>
+    <p>
+      <span>
+        <span>FIERCE</span>
       </span>
     </p>
   </div>
+  <p class="description__text">
+    <span>
+      <span
+        >Organized, large-scale,armed conflict between countries or between national, ethnic, or
+        other sizeable groups, usually but not always involving active engagement of military
+        forces.</span
+      >
+    </span>
+  </p>
 </template>
 
 <script setup>
