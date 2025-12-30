@@ -274,16 +274,28 @@ const addScrollListener = () => {
     let touchStartGridX = 0
     let touchStartGridY = 0
     let isTouching = false
+    let isScrolling = false
+    let touchMoveAnimation = null
+    let touchStartElement = null
+    let touchStartTime = 0
 
     const handleTouchStart = (e) => {
       const grid = mainGridRef.value?.gridRef
       if (!grid || showDetails.value || isClosing.value || isAnimating.value) return
 
+      touchStartElement = e.target
+      touchStartTime = Date.now()
       isTouching = true
+      isScrolling = false
       touchStartX = e.touches[0].clientX
       touchStartY = e.touches[0].clientY
       touchStartGridX = gsap.getProperty(grid, 'x')
       touchStartGridY = gsap.getProperty(grid, 'y')
+
+      // Kill animazione precedente se esiste
+      if (touchMoveAnimation) {
+        touchMoveAnimation.kill()
+      }
     }
 
     const handleTouchMove = (e) => {
@@ -292,28 +304,93 @@ const addScrollListener = () => {
       const grid = mainGridRef.value?.gridRef
       if (!grid) return
 
-      const deltaX = touchStartX - e.touches[0].clientX
-      const deltaY = touchStartY - e.touches[0].clientY
+      const currentX = e.touches[0].clientX
+      const currentY = e.touches[0].clientY
 
-      const bounds = {
-        minX: -(grid.offsetWidth - window.innerWidth) - 200,
-        maxX: 200,
-        minY: -(grid.offsetHeight - window.innerHeight) - 200,
-        maxY: 100,
+      const deltaX = touchStartX - currentX
+      const deltaY = touchStartY - currentY
+
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+
+      // Su touchscreen, anche piccoli movimenti (>3px) sono considerati scroll
+      // Ma solo se non si sta toccando direttamente un'immagine
+      const isTouchingPainting =
+        touchStartElement?.closest('.painting') || e.target.closest('.painting')
+
+      if (distance > 3 && !isTouchingPainting) {
+        if (!isScrolling) {
+          isScrolling = true
+        }
+        e.preventDefault()
+        e.stopPropagation()
+
+        const bounds = {
+          minX: -(grid.offsetWidth - window.innerWidth) - 200,
+          maxX: 200,
+          minY: -(grid.offsetHeight - window.innerHeight) - 200,
+          maxY: 100,
+        }
+
+        const newX = Math.max(bounds.minX, Math.min(bounds.maxX, touchStartGridX - deltaX))
+        const newY = Math.max(bounds.minY, Math.min(bounds.maxY, touchStartGridY - deltaY))
+
+        // Usa set per movimento immediato durante il drag
+        gsap.set(grid, { x: newX, y: newY })
+      } else if (distance <= 3 && isTouchingPainting) {
+        // Se il movimento è minimo e si sta toccando un'immagine, permettere il tap
+        // Non fare preventDefault per permettere il click
+      }
+    }
+
+    const handleTouchEnd = (e) => {
+      if (!isTouching) return
+
+      const touchDuration = Date.now() - touchStartTime
+      const currentX = e.changedTouches[0]?.clientX || touchStartX
+      const currentY = e.changedTouches[0]?.clientY || touchStartY
+      const finalDeltaX = touchStartX - currentX
+      const finalDeltaY = touchStartY - currentY
+      const finalDistance = Math.sqrt(finalDeltaX * finalDeltaX + finalDeltaY * finalDeltaY)
+
+      // Se era uno scroll significativo, aggiungi inerzia
+      if (isScrolling && finalDistance > 5) {
+        const grid = mainGridRef.value?.gridRef
+        if (grid) {
+          const currentGridX = gsap.getProperty(grid, 'x')
+          const currentGridY = gsap.getProperty(grid, 'y')
+
+          // Aggiungi un po' di inerzia basata sulla velocità
+          const velocity = finalDistance / Math.max(touchDuration, 1)
+          const inertiaX = finalDeltaX * velocity * 0.1
+          const inertiaY = finalDeltaY * velocity * 0.1
+
+          const bounds = {
+            minX: -(grid.offsetWidth - window.innerWidth) - 200,
+            maxX: 200,
+            minY: -(grid.offsetHeight - window.innerHeight) - 200,
+            maxY: 100,
+          }
+
+          const newX = Math.max(bounds.minX, Math.min(bounds.maxX, currentGridX + inertiaX))
+          const newY = Math.max(bounds.minY, Math.min(bounds.maxY, currentGridY + inertiaY))
+
+          touchMoveAnimation = gsap.to(grid, {
+            x: newX,
+            y: newY,
+            duration: 0.3,
+            ease: 'power2.out',
+          })
+        }
       }
 
-      const newX = Math.max(bounds.minX, Math.min(bounds.maxX, touchStartGridX - deltaX))
-      const newY = Math.max(bounds.minY, Math.min(bounds.maxY, touchStartGridY - deltaY))
-
-      gsap.set(grid, { x: newX, y: newY })
-    }
-
-    const handleTouchEnd = () => {
       isTouching = false
+      isScrolling = false
+      touchStartElement = null
     }
 
+    // Usa passive: false su touchmove per poter fare preventDefault
     window.addEventListener('touchstart', handleTouchStart, { passive: true })
-    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
     window.addEventListener('touchend', handleTouchEnd, { passive: true })
   }
 }
