@@ -13,16 +13,34 @@
       @close="closeDetails"
     />
   </div>
+  <div ref="homeButtonRef" class="home-button" @click.stop="goToHero">
+    <h2>Home</h2>
+  </div>
+  <div class="blum-overlay"></div>
+  <div class="blum-overlay"></div>
+  <div class="blum-overlay"></div>
 </template>
 
 <script setup>
 // IMPORTS
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import MainGrid from './MainGrid.vue'
 import PaintingDetails from './PaintingDetails.vue'
 import { Draggable, Flip, SplitText } from 'gsap/all'
 import gsap from 'gsap'
 import paintingsData from '../data/paintings.json'
+
+const emit = defineEmits(['navigate'])
+
+const goToHero = (e) => {
+  if (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    e.stopImmediatePropagation()
+  }
+  emit('navigate', 'hero')
+  return false
+}
 
 // PLUGIN REGISTRATION
 gsap.registerPlugin(Draggable, Flip, SplitText)
@@ -31,11 +49,13 @@ gsap.registerPlugin(Draggable, Flip, SplitText)
 const containerRef = ref(null)
 const mainGridRef = ref(null)
 const paintingDetailsRef = ref(null)
+const homeButtonRef = ref(null)
 
 const isDragging = ref(false)
 const showDetails = ref(false)
 const currentPainting = ref(null)
 const isClosing = ref(false)
+const isAnimating = ref(false)
 
 const currentPaintingElement = ref(null)
 const originalParent = ref(null)
@@ -94,6 +114,12 @@ const intro = async () => {
 
   if (!grid) return
 
+  // Blocca lo scroll durante l'animazione
+  isAnimating.value = true
+  document.body.style.overflow = 'hidden'
+  document.body.style.position = 'fixed'
+  document.body.style.width = '100%'
+
   const timeline = gsap.timeline()
 
   timeline.set(containerRef.value, {
@@ -130,6 +156,27 @@ const intro = async () => {
         if (details) {
           gsap.set(details, { opacity: 1 })
         }
+        // Home button delay
+        if (homeButtonRef.value) {
+          gsap.fromTo(
+            homeButtonRef.value,
+            {
+              opacity: 0,
+              y: -20,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+            },
+          )
+        }
+        // Sblocca lo scroll dopo che l'animazione è completata
+        isAnimating.value = false
+        document.body.style.overflow = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
       },
     },
     '+=0.3',
@@ -169,7 +216,7 @@ const addScrollListener = () => {
     const grid = mainGridRef.value?.gridRef
     if (!grid) return
 
-    if (showDetails.value || isClosing.value) return
+    if (showDetails.value || isClosing.value || isAnimating.value) return
 
     const deltaX = -e.deltaX * 3
     const deltaY = -e.deltaY * 3
@@ -555,6 +602,19 @@ onMounted(async () => {
   setupDraggable()
   addScrollListener()
   observeProducts()
+
+  // Aggiungi event listener manualmente su home button
+  if (homeButtonRef.value) {
+    homeButtonRef.value.addEventListener('click', goToHero)
+    homeButtonRef.value.addEventListener('mousedown', goToHero)
+  }
+})
+
+onUnmounted(() => {
+  if (homeButtonRef.value) {
+    homeButtonRef.value.removeEventListener('click', goToHero)
+    homeButtonRef.value.removeEventListener('mousedown', goToHero)
+  }
 })
 </script>
 
@@ -568,6 +628,43 @@ onMounted(async () => {
 
   transform-origin: center center;
   will-change: transform;
+}
+
+.home-button {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10001;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  opacity: 0;
+}
+
+.home-button h2 {
+  margin: 0;
+  font-family: 'EB Garamond', 'Serif';
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  font-weight: 400;
+  color: #c49852;
+}
+
+.blum-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('../assets/img/blum.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
 }
 
 .container::before {

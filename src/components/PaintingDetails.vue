@@ -105,9 +105,12 @@ defineExpose({
 }
 
 .details__title {
+  font-family: 'EB Garamond', sans-serif;
+  font-style: italic;
   margin-bottom: 2vw;
   position: relative;
   display: grid;
+  color: #c49852;
 
   @media (max-width: 768px) {
     margin-bottom: 3vw;
@@ -129,15 +132,14 @@ defineExpose({
 }
 
 .details__meta {
+  font-family: 'EB Garamond', sans-serif;
   margin-bottom: 2vw;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.2rem;
 
   p {
-    font-family: 'Neue Montreal', sans-serif;
     font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-    color: #5d3136;
   }
 
   .meta__artist {
@@ -167,10 +169,10 @@ defineExpose({
 
   p {
     overflow: hidden;
-    font-family: 'Neue Montreal', sans-serif;
+    font-family: 'EB Garamond', sans-serif;
     font-size: clamp(0.95rem, 1.1vw, 1.05rem);
     line-height: 1.6;
-    color: #5d3136;
+    color: #000;
 
     @media (max-width: 768px) {
       font-size: clamp(0.9rem, 3.5vw, 1rem);

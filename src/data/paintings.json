@@ -30,7 +30,7 @@
     {
       "id": 4,
       "title": "The Charging Chasseur",
-      "artist": "Théodore Géricault ",
+      "artist": "Théodore Géricault",
       "year": 1812,
       "description": "Mounted Napoleonic cavalry officer who is ready to attack.",
       "Location": "Musèe du Louvre, Paris",
@@ -221,9 +221,144 @@
       "title": "Lannes' death at Essling",
       "artist": "Paul-Émile Boutigny",
       "year": 1894,
-      "description": "Lannes mortally wounded at Essling",
+      "description": "Lannes mortally wounded at Essling.",
       "Location": " Musée des Beaux-Arts, France",
       "image": "../assets/img/paintings/25.webp"
+    },
+    {
+      "id": 26,
+      "title": "The Battle of Eylau",
+      "artist": "Jean Antoine Simeon Fort",
+      "year": 1843,
+      "description": "The painting shows a dramatic cavalry charge during the Battle of Eylau in 1807, fought in a snowy landscape. ",
+      "Location": "Palace of Versailles, Versailles",
+      "image": "../assets/img/paintings/26.webp"
+    },
+    {
+      "id": 27,
+      "title": "Grenadier Leontiy Korennoy",
+      "artist": "Polidor Ivanovič Babaev",
+      "year": 1846,
+      "description": "Feat of the grenadier Leontiy Korennoy of the Leib‑Guards Finnish Regiment during the 1813 Battle of Leipzig. ",
+      "Location": "Russian Museum, St. Petersburg",
+      "image": "../assets/img/paintings/27.webp"
+    },
+    {
+      "id": 28,
+      "title": "Cavalry and Tanks at Arras, 1918",
+      "artist": "Alfred Bastien",
+      "year": 1918,
+      "description": "Tanks and cavalry during the advance near Arras in 1918.",
+      "Location": "Canadian War Museum, Ottawa",
+      "image": "../assets/img/paintings/28.webp"
+    },
+    {
+      "id": 29,
+      "title": "French infantrymen",
+      "artist": "Georges Scott",
+      "year": 1915,
+      "description": "French troops charging a German trench during World War I. In the background, soldiers advance equipped for assault, while in the foreground, two French infantrymen prepare to strike Germans below with bayonets.",
+      "Location": "La Contemporaine, Nanterre",
+      "image": "../assets/img/paintings/29.webp"
+    },
+    {
+      "id": 30,
+      "title": "Retreat from Moscow",
+      "artist": "Adolphe Yvon",
+      "year": 1856,
+      "description": "Marshall Ney supporting the Rear Guard During the Retreat from Moscow.",
+      "Location": "Manchester Art Gallery, Manchester",
+      "image": "../assets/img/paintings/30.webp"
+    },
+    {
+      "id": 31,
+      "title": "Body of General Abel Douay",
+      "artist": "Anton von Werner",
+      "year": 1870,
+      "description": "Crown Prince Friedrich Wilhelm on the body of General Abel Douay, Weissenburg on the 4th August 1870.",
+      "Location": "Hohenzollern Castle, Germany",
+      "image": "../assets/img/paintings/31.webp"
+    },
+    {
+      "id": 32,
+      "title": "That Two-Thousand Yard Stare",
+      "artist": "Thomas C. Lea III",
+      "year": 1944,
+      "description": "An exhausted U.S. Marine with a vacant, distant gaze that symbolizes combat stress and psychological trauma.",
+      "Location": "Fort Lesley J. McNair, Washington DC",
+      "image": "../assets/img/paintings/32.webp"
+    },
+    {
+      "id": 33,
+      "title": "Ligny",
+      "artist": "Ernest Crofts ",
+      "year": 1875,
+      "description": "This is a representation of the Battle of Ligny in 1815, showing Napoleon surrounded by his staff surveying the battlefield while columns of infantry advance to the front.",
+      "Location": "National Army Museum, London",
+      "image": "../assets/img/paintings/33.webp"
+    },
+    {
+      "id": 34,
+      "title": "Death as general rides a horse on a battlefield",
+      "artist": "Edgar Bundy ",
+      "year": 1911,
+      "description": "The watercolour shows Death personified as a military general riding a horse across a chaotic battlefield, surrounded by smoke, fallen soldiers, and the ruins of war.",
+      "Location": "Wellcome Trust, London",
+      "image": "../assets/img/paintings/34.webp"
+    },
+    {
+      "id": 35,
+      "title": "Death as general rides a horse on a battlefield",
+      "artist": "Edgar Bundy ",
+      "year": 1911,
+      "description": "The watercolour shows Death personified as a military general riding a horse across a chaotic battlefield, surrounded by smoke, fallen soldiers, and the ruins of war.",
+      "Location": "Wellcome Trust, London",
+      "image": "../assets/img/paintings/35.webp"
+    },
+    {
+      "id": 36,
+      "title": "Reply of the Zaporozhian Cossacks",
+      "artist": "Ilya Repin ",
+      "year": 1891,
+      "description": "Based on the legend of Cossacks sending an insulting reply to an ultimatum from the Sultan of the Ottoman Empire, Mehmed IV.",
+      "Location": "State Russian Museum, Saint Petersburg",
+      "image": "../assets/img/paintings/36.webp"
+    },
+    {
+      "id": 37,
+      "title": "Twas A Famous Victory",
+      "artist": "Edward R. Taylor",
+      "year": 1883,
+      "description": "An elderly veteran stands in front of two boys inside a museum, pointing to the painting depicting the Battle of Trafalgar in which he participated.",
+      "Location": "Birmingham Museums Trust, Birmingham",
+      "image": "../assets/img/paintings/37.webp"
+    },
+    {
+      "id": 38,
+      "title": "Sortie de la garnison de Huningue",
+      "artist": "Édouard Detaille",
+      "year": 1909,
+      "description": "famous painting and print depicting the honorable exit of the French garrison from Huningue after its capitulation in 1815, showing the French general and his contingent parading in front of the Allied troops, symbolizing courage and military discipline despite defeat, a work that captures the historical moment and French military pride.",
+      "Location": "Musée d'Orsay, Paris",
+      "image": "../assets/img/paintings/38.webp"
+    },
+    {
+      "id": 39,
+      "title": "Battle of Bunker Hill",
+      "artist": "Howard Pyle",
+      "year": 1897,
+      "description": "A British force conquering the hill",
+      "Location": "Delaware Art Museum, Wilmington",
+      "image": "../assets/img/paintings/39.webp"
+    },
+    {
+      "id": 40,
+      "title": "Closing the Gates at Hougoumont",
+      "artist": "Robert Gibb",
+      "year": 1926,
+      "description": "Coldstream Guards closing the gates of Hougoumont Farm to the advancing French during the Battle of Waterloo.",
+      "Location": "National War Museum, Edinburgh Castle",
+      "image": "../assets/img/paintings/40.webp"
     }
   ]
 }

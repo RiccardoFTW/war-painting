@@ -1,45 +1,33 @@
 <template>
   <div class="hero__container">
+    <nav class="navbar">
+      <p>Experimental Project</p>
+      <p>©2025</p>
+    </nav>
     <div class="hero__title">
-      <h1>WAR PAINTINGS</h1>
+      <div class="title__container">
+        <h1 class="title__one">War</h1>
+
+        <h1 class="title__two">On</h1>
+
+        <h1 class="title__three">Canvas</h1>
+      </div>
     </div>
-    <div class="emotions__container">
+    <div class="footer">
+      <p>Made in Vue + GSAP</p>
       <p>
-        <span>
-          <span>GLORIOUS</span>
-        </span>
+        Based on this great
+        <a
+          href="https://tympanus.net/codrops/2025/09/01/recreating-palmers-draggable-product-grid-with-gsap/"
+          >article</a
+        >
+        by <a href="https://www.linkedin.com/in/joffrey-spitzer-08aaa9158/">Jeffrey</a>
       </p>
-      <p>
-        <span>
-          <span>APOCALYPTIC</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>BRUTAL</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>HEROIC</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>VISCERAL</span>
-        </span>
-      </p>
-      <p>
-        <span>
-          <span>FIERCE</span>
-        </span>
-      </p>
-    </div>
-    <div class="about__container">
-      <p>a collection of works to tell the story of the war over the years</p>
     </div>
   </div>
-
+  <div class="blum-overlay"></div>
+  <div class="blum-overlay"></div>
+  <div class="blum-overlay"></div>
   <div class="img-wrapper">
     <img
       v-for="(image, index) in images"
@@ -52,13 +40,16 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue'
 import gsap from 'gsap'
+import { SplitText } from 'gsap/all'
 import paintingsData from '../data/paintings.json'
+
+gsap.registerPlugin(SplitText)
 
 const images = computed(() => {
   const shuffled = [...paintingsData.paintings].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, 25).map((painting) => {
+  return shuffled.slice(0, 40).map((painting) => {
     const imageName = painting.image.split('/').pop()
     return {
       src: new URL(`../assets/img/paintings/${imageName}`, import.meta.url).href,
@@ -67,15 +58,26 @@ const images = computed(() => {
   })
 })
 
-let imgNum = 0
-let lastPosX = 0
-let lastPosY = 0
-let isCounting = true
-let startFromX = 0
-let startFromY = 0
-let allImages = []
+const imgNum = ref(0)
+const isCounting = ref(true)
+const startFromX = ref(0)
+const startFromY = ref(0)
+const allImages = ref([])
+const hasNavigated = ref(false)
 
-// RESPONSIVE HELPERS
+const emit = defineEmits(['navigate'])
+
+const handleScroll = (e) => {
+  if (hasNavigated.value) return
+
+  const deltaY = e.deltaY
+  if (deltaY > 0) {
+    hasNavigated.value = true
+    emit('navigate', 'main')
+  }
+}
+
+// ===== HELPERS RESPONSIVE =====
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
 
@@ -86,9 +88,9 @@ const getThreshold = () => {
 }
 
 const getImageScale = () => {
-  if (isMobile()) return 1.2
-  if (isTablet()) return 1.3
-  return 1.4
+  if (isMobile()) return 2
+  if (isTablet()) return 2
+  return 2.5
 }
 
 const handleMouseMove = (e) => {
@@ -97,44 +99,48 @@ const handleMouseMove = (e) => {
   const threshold = getThreshold()
 
   const hasCrossedThreshold =
-    x > startFromX + threshold ||
-    x < startFromX - threshold ||
-    y > startFromY + threshold ||
-    y < startFromY - threshold
+    x > startFromX.value + threshold ||
+    x < startFromX.value - threshold ||
+    y > startFromY.value + threshold ||
+    y < startFromY.value - threshold
 
   if (hasCrossedThreshold) {
     showNextImage(e)
-    isCounting = true
+    isCounting.value = true
   }
 
-  if (isCounting) {
-    startFromX = x
-    startFromY = y
+  if (isCounting.value) {
+    startFromX.value = x
+    startFromY.value = y
   }
 
-  isCounting = false
+  isCounting.value = false
 }
 
-const showNextImage = (e) => {
-  if (!allImages.length) return
+const showNextImage = () => {
+  if (!allImages.value.length) return
 
-  const movingImage = allImages[imgNum]
-  const curPosX = e.clientX
-  const curPosY = e.clientY
-
-  gsap.set(movingImage, {
-    left: curPosX,
-    top: curPosY,
-    opacity: 0,
+  gsap.killTweensOf('.trail-image')
+  allImages.value.forEach((img) => {
+    gsap.set(img, {
+      opacity: 0,
+    })
   })
 
-  const movingDistanceX = ((curPosX - lastPosX) * 100) / 100
-  const movingDistanceY = ((curPosY - lastPosY) * 100) / 100
+  const movingImage = allImages.value[imgNum.value]
+  const centerX = window.innerWidth / 2
+  const centerY = window.innerHeight / 2
+
+  gsap.set(movingImage, {
+    left: centerX,
+    top: centerY,
+    opacity: 0,
+  })
 
   const tl = gsap.timeline()
 
   tl.to(movingImage, {
-    opacity: 0.8,
+    opacity: 1,
     duration: 0.6,
     scale: getImageScale(),
     ease: 'power3.out',
@@ -143,46 +149,104 @@ const showNextImage = (e) => {
   tl.to(
     movingImage,
     {
-      left: lastPosX + movingDistanceX,
-      top: lastPosY + movingDistanceY,
+      opacity: 1,
+      scale: getImageScale(),
       duration: 1.5,
       ease: 'power1.out',
     },
-    '-=0.4',
+    '-=0.1',
   )
 
-  tl.to(
-    movingImage,
-    {
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power1.inOut',
-    },
-    '+=0.3',
-  )
+  tl.to(movingImage, {
+    opacity: 0,
+    duration: 0.8,
+    ease: 'power1.inOut',
+  })
 
-  imgNum++
-  if (imgNum >= allImages.length) {
-    imgNum = 0
+  imgNum.value++
+  if (imgNum.value >= allImages.value.length) {
+    imgNum.value = 0
   }
-
-  lastPosX = curPosX
-  lastPosY = curPosY
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    const imgWrapper = document.querySelector('.img-wrapper')
-    if (imgWrapper) {
-      allImages = [...imgWrapper.querySelectorAll('.trail-image')]
-    }
-  }, 80)
+// ===== TEXT ANIMATIONS =====
+const animateTexts = async () => {
+  await nextTick()
+
+  const timeline = gsap.timeline()
+  const splits = []
+  // NAVBAR
+  const navbarTexts = document.querySelectorAll('.navbar p')
+  navbarTexts.forEach((text, index) => {
+    gsap.set(text, { opacity: 1 })
+
+    const split = new SplitText(text, {
+      type: 'chars',
+      charsClass: 'char',
+    })
+    splits.push(split)
+
+    timeline.fromTo(
+      split.chars,
+      {
+        y: '120%',
+        opacity: 0,
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: 'power3.in',
+        stagger: 0.06,
+      },
+      index * 0.1,
+    )
+  })
+  // FOOTER
+  const footerTexts = document.querySelectorAll('.footer p')
+  footerTexts.forEach((text, index) => {
+    gsap.set(text, { opacity: 1 })
+
+    const split = new SplitText(text, {
+      type: 'chars',
+      charsClass: 'char',
+    })
+    splits.push(split)
+
+    timeline.fromTo(
+      split.chars,
+      {
+        y: '120%',
+        opacity: 0,
+      },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: 'power4.out',
+        stagger: 0.02,
+      },
+      navbarTexts.length * 0.1 + index * 0.3,
+    )
+  })
+}
+
+// ===== LIFECYCLE HOOKS =====
+onMounted(async () => {
+  await nextTick()
+  const imgWrapper = document.querySelector('.img-wrapper')
+  if (imgWrapper) {
+    allImages.value = [...imgWrapper.querySelectorAll('.trail-image')]
+  }
 
   document.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('wheel', handleScroll, { passive: false })
+  animateTexts()
 })
 
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('wheel', handleScroll)
   gsap.killTweensOf('.trail-image')
 })
 </script>
@@ -190,86 +254,119 @@ onUnmounted(() => {
 <style scoped>
 .hero__container {
   position: fixed;
+  top: 0;
+  left: 0;
   height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  position: relative;
+  justify-content: flex-start;
   z-index: 10;
+  pointer-events: none;
 }
 
-.hero__container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
+.navbar {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  height: 100%;
-  background-image: url(../assets/img/intro-img/6.svg);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.08;
-  z-index: -1;
-  pointer-events: none;
+  padding: 0 0.8rem;
+  pointer-events: auto;
+}
+
+.navbar p {
+  margin: 0;
+  font-family: 'EB Garamond', ' Serif';
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0;
+
+  @media (max-width: 768px) {
+    margin: 0;
+    font-size: clamp(0.8rem, 1vw, 0.8rem);
+  }
 }
 
 .hero__title {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0 0.8rem;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+  pointer-events: auto;
+  color: #c49852;
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
+}
+
+.title__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
 }
 
 .hero__title h1 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(1rem, 23vw, 15rem);
-  font-weight: 400;
-  color: blue;
+  font-family: 'EB Garamond', 'Serif';
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
   line-height: 0.8;
-  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.emotions__container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 7rem;
-  font-family: 'Neue Montreal';
-  color: blue;
-  font-size: clamp(0.8rem, 1.2vw, 1rem);
+.footer {
+  width: 100%;
+  padding: 0 0.8rem;
+  pointer-events: auto;
+  display: flex;
+  justify-content: space-between;
+}
 
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4rem;
-  }
+.footer p {
+  margin: 0;
+  font-family: 'EB Garamond', 'Serif';
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.5;
+  text-align: center;
+  text-transform: none;
+  opacity: 0;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    padding: 0 1rem;
+    font-size: clamp(0.8rem, 1vw, 0.8rem);
   }
 }
 
-.about__container {
-  font-family: 'Neue Montreal', serif;
-  font-size: clamp(1rem, 2vw, 1.5rem);
-  color: blue;
-  text-align: center;
-  padding: 1rem;
-  text-transform: uppercase;
+.footer a {
+  color: #c49852;
 }
 
-.img-wrapper {
+.blum-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  background-image: url('../assets/img/blum.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: none;
-  z-index: 5;
+  z-index: 7;
+  opacity: 0.5;
 }
 
 .trail-image {
@@ -287,5 +384,10 @@ onUnmounted(() => {
   @media (max-width: 768px) {
     width: 100px;
   }
+}
+
+.char,
+.line {
+  transform: translate3d(0, 100%, 0);
 }
 </style>

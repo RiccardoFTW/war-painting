@@ -1,91 +1,135 @@
 <template>
   <div class="intro__container">
-    <h1 class="war">
-      <span>
-        <span>WAR</span>
-      </span>
-    </h1>
+    <div class="element__container">
+      <div class="columns__container">
+        <div class="column">
+          <p class="text-black">Diego Velàzquez</p>
+          <p class="text-gold">Museo del Prado</p>
+          <p class="text-black">Hendrick Vroom</p>
+          <p class="text-gold">Rijks Museum</p>
+          <p class="text-black">John Singleton Copley</p>
+        </div>
+        <div class="column">
+          <p class="text-gold">Jersey Museum and Art Gallery</p>
+          <p class="text-black">Théodore Géricault</p>
+          <p class="text-gold">Musèe du Louvre</p>
+          <p class="text-black">Jan Matejko</p>
+          <p class="text-gold">National Museum</p>
+        </div>
+        <div class="column">
+          <p class="text-black">Ivan Aivazovsky</p>
+          <p class="text-gold">Aivazovsky Art Gallery</p>
+          <p class="text-black">Otto Dix</p>
+          <p class="text-gold">Otto Dix Haus</p>
+          <p class="text-black">Jean-Louis-Ernest Meissonier</p>
+        </div>
+        <div class="column">
+          <p class="text-gold">Meissonier's studio</p>
+          <p class="text-black">Jean-Louis-Ernest Meissonier</p>
+          <p class="text-gold">Musée d'Orsay, Paris</p>
+          <p class="text-black">Elizabeth Thompson</p>
+          <p class="text-gold">Leeds Art Gallery, Leeds</p>
+        </div>
+        <div class="column">
+          <p class="text-black">Arturo Michelena</p>
+          <p class="text-gold">Museo de Bellas Artes</p>
+          <p class="text-black">Augusto Ferrer-Dalmau</p>
+          <p class="text-gold">Private Collection</p>
+          <p class="text-black">William Barnes Wollen</p>
+        </div>
+        <div class="column">
+          <p class="text-gold">Chelmsford Museum</p>
+          <p class="text-black">Albrecht Altdorfer</p>
+          <p class="text-gold">Alte Pinakothek, Munich</p>
+          <p class="text-black">Girodet de Roussy-Trioson</p>
+          <p class="text-gold">Palace of Versailles</p>
+        </div>
+        <div class="column">
+          <p class="text-black">Emanuel Leutze</p>
+          <p class="text-gold">Metropolitan Museum of Art</p>
+          <p class="text-black">Umberto Boccioni</p>
+          <p class="text-gold">Museo del Novecento</p>
+          <p class="text-black">Benjamin West</p>
+        </div>
+        <div class="column">
+          <p class="text-gold">National Gallery of Canada</p>
+          <p class="text-black">Benjamin West</p>
+          <p class="text-gold">National Gallery of Art</p>
+          <p class="text-black">Dominic Serres</p>
+          <p class="text-gold">National Maritime Museum</p>
+        </div>
+      </div>
+    </div>
+    <div class="blum-overlay"></div>
+    <div class="blum-overlay"></div>
+    <div class="blum-overlay"></div>
   </div>
-  <div class="emotions__container">
-    <p>
-      <span>
-        <span>GLORIOUS</span>
-      </span>
-    </p>
-    <p>
-      <span>
-        <span>APOCALYPTIC</span>
-      </span>
-    </p>
-    <p>
-      <span>
-        <span>BRUTAL</span>
-      </span>
-    </p>
-    <p>
-      <span>
-        <span>HEROIC</span>
-      </span>
-    </p>
-    <p>
-      <span>
-        <span>VISCERAL</span>
-      </span>
-    </p>
-    <p>
-      <span>
-        <span>FIERCE</span>
-      </span>
-    </p>
-  </div>
-  <p class="description__text">
-    <span>
-      <span
-        >Organized, large-scale,armed conflict between countries or between national, ethnic, or
-        other sizeable groups, usually but not always involving active engagement of military
-        forces.</span
-      >
-    </span>
-  </p>
 </template>
 
 <script setup>
 import { onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
+import { SplitText } from 'gsap/all'
+
+gsap.registerPlugin(SplitText)
+
+const emit = defineEmits(['navigate'])
+
+// ===== TEXT ANIMATIONS =====
+const animateColumns = async () => {
+  await nextTick()
+
+  const timeline = gsap.timeline({
+    onComplete: () => {
+      // Dopo che tutte le animazioni sono completate, transizione verso HeroPage
+      setTimeout(() => {
+        emit('navigate', 'hero')
+      }, 600) // Piccolo delay prima della transizione
+    },
+  })
+
+  const splits = []
+  const columns = document.querySelectorAll('.column')
+
+  columns.forEach((column, columnIndex) => {
+    const texts = column.querySelectorAll('p')
+
+    texts.forEach((text, textIndex) => {
+      gsap.set(text, { opacity: 1 })
+
+      const split = new SplitText(text, {
+        type: 'chars',
+        charsClass: 'char',
+      })
+      splits.push(split)
+
+      // Calcola il timing: ogni colonna inizia dopo la precedente, ogni testo nella colonna è leggermente sfalsato
+      const startTime =
+        columnIndex * 0.5 + // Delay tra colonne
+        textIndex * 0.1 // Delay tra testi nella stessa colonna
+
+      timeline.fromTo(
+        split.chars,
+        {
+          y: '120%',
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power3.in',
+          stagger: 0.06,
+        },
+        startTime,
+      )
+    })
+  })
+}
 
 onMounted(async () => {
   await nextTick()
-
-  const tl = gsap.timeline()
-
-  tl.from('h1 span>span', {
-    duration: 3,
-    y: 200,
-    ease: 'Power3.out',
-    stagger: 1.5,
-  })
-    .from(
-      '.description__text span>span',
-      {
-        duration: 2,
-        y: 50,
-        autoAlpha: 0,
-        ease: 'Power3.out',
-      },
-      '+=0.1',
-    )
-
-    .from(
-      '.emotions__container p span>span',
-      {
-        duration: 2,
-        y: 50,
-        autoAlpha: 0,
-        ease: 'Power3.out',
-        stagger: 0.8,
-      },
-      '+=0.8',
-    )
+  animateColumns()
 })
 </script>
 
@@ -96,84 +140,82 @@ onMounted(async () => {
   width: 100vw;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  position: relative;
 }
 
-.intro__container::before {
-  content: '';
-  position: absolute;
+.element__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem 0;
+  gap: 2rem;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.columns__container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  padding: 0 0.8rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.column p {
+  margin: 0;
+  font-family: 'EB Garamond', 'Serif';
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.75rem, 0.8vw, 0.875rem);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+}
+
+.text-black {
+  color: #000;
+}
+
+.text-gold {
+  color: #c49852;
+}
+
+.char,
+.line {
+  transform: translate3d(0, 100%, 0);
+}
+
+.blum-overlay {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url(../assets/img/intro-img/6.svg);
+  width: 100vw;
+  height: 100vh;
+  background-image: url('../assets/img/blum.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.05;
-  z-index: -1;
   pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
 }
 
-.war {
-  font-family: 'Instrument Serif', serif;
-  font-weight: 400;
-  font-size: clamp(3rem, 15vw, 128px);
-  color: #5d3136;
-
-  @media (max-width: 768px) {
-    font-size: clamp(2.5rem, 12vw, 4rem);
-  }
-}
-
-span {
-  display: block;
-  overflow: hidden;
-  padding: 1vw;
-  margin: 0 !important;
-
-  @media (max-width: 768px) {
-    padding: 0.5rem;
-  }
-}
-
-.emotions__container {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 7rem;
-  font-family: 'Neue Montreal';
-  color: #5d3136;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4rem;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    padding: 0 1rem;
-  }
-}
-
-.description__text {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  color: #5d3136;
-  text-align: center;
-  max-width: 1000px;
-  text-transform: uppercase;
-
-  @media (max-width: 1024px) {
-    max-width: 800px;
-    padding: 0 2rem;
-  }
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-    padding: 0 1.5rem;
+@media (max-width: 768px) {
+  .columns__container {
+    gap: 1rem;
+    padding: 0 0.5rem;
   }
 }
 </style>
