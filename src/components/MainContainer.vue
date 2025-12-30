@@ -674,7 +674,7 @@ onUnmounted(() => {
   height: 100vh;
   top: 0;
   left: 0;
-  background-image: url(../assets/img/intro-img/6.svg);
+  /* background-image: url(../assets/img/intro-img/6.svg); */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

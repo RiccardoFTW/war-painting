@@ -28,7 +28,11 @@ const getImagePath = (imagePath) => {
   if (!imagePath) return ''
 
   try {
-    return new URL(imagePath, import.meta.url).href
+    // Estrai il nome del file dal path (stesso metodo usato in HeroPage.vue)
+    const imageName = imagePath.split('/').pop()
+    // Usa new URL con il path corretto relativo a import.meta.url
+    // Questo è lo stesso metodo che funziona in HeroPage.vue
+    return new URL(`../assets/img/paintings/${imageName}`, import.meta.url).href
   } catch (error) {
     console.error('Errore caricamento immagine:', imagePath, error)
     return ''
