@@ -68,6 +68,7 @@ defineExpose({
   height: max-content;
   display: flex;
   gap: 10vw;
+  touch-action: pan-x pan-y;
 
   @media (max-width: 1024px) {
     gap: 10vw;

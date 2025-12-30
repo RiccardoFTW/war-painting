@@ -189,6 +189,11 @@ const setupDraggable = () => {
 
   if (!grid) return
 
+  // Su mobile, disabilita il draggable per evitare conflitti con tap
+  if (isMobile()) {
+    return
+  }
+
   Draggable.create(grid, {
     type: 'x,y',
     bounds: {
@@ -209,6 +214,10 @@ const setupDraggable = () => {
   })
 }
 
+let scrollAnimation = null
+let lastScrollTime = 0
+const SCROLL_THROTTLE = 16 // ~60fps
+
 const addScrollListener = () => {
   const handleWheel = (e) => {
     e.preventDefault()
@@ -217,6 +226,16 @@ const addScrollListener = () => {
     if (!grid) return
 
     if (showDetails.value || isClosing.value || isAnimating.value) return
+
+    // Throttle per migliorare le performance
+    const now = Date.now()
+    if (now - lastScrollTime < SCROLL_THROTTLE) return
+    lastScrollTime = now
+
+    // Kill animazione precedente per evitare scatti
+    if (scrollAnimation) {
+      scrollAnimation.kill()
+    }
 
     const deltaX = -e.deltaX * 3
     const deltaY = -e.deltaY * 3
@@ -237,15 +256,66 @@ const addScrollListener = () => {
     const clampedX = Math.max(bounds.minX, Math.min(bounds.maxX, newX))
     const clampedY = Math.max(bounds.minY, Math.min(bounds.maxY, newY))
 
-    gsap.to(grid, {
+    // Usa duration più breve per scroll più fluido
+    scrollAnimation = gsap.to(grid, {
       x: clampedX,
       y: clampedY,
-      duration: 0.3,
-      ease: 'power3.out',
+      duration: 0.15,
+      ease: 'power2.out',
     })
   }
 
   window.addEventListener('wheel', handleWheel, { passive: false })
+
+  // Su mobile, aggiungi supporto per touch scroll
+  if (isMobile()) {
+    let touchStartX = 0
+    let touchStartY = 0
+    let touchStartGridX = 0
+    let touchStartGridY = 0
+    let isTouching = false
+
+    const handleTouchStart = (e) => {
+      const grid = mainGridRef.value?.gridRef
+      if (!grid || showDetails.value || isClosing.value || isAnimating.value) return
+
+      isTouching = true
+      touchStartX = e.touches[0].clientX
+      touchStartY = e.touches[0].clientY
+      touchStartGridX = gsap.getProperty(grid, 'x')
+      touchStartGridY = gsap.getProperty(grid, 'y')
+    }
+
+    const handleTouchMove = (e) => {
+      if (!isTouching) return
+
+      const grid = mainGridRef.value?.gridRef
+      if (!grid) return
+
+      const deltaX = touchStartX - e.touches[0].clientX
+      const deltaY = touchStartY - e.touches[0].clientY
+
+      const bounds = {
+        minX: -(grid.offsetWidth - window.innerWidth) - 200,
+        maxX: 200,
+        minY: -(grid.offsetHeight - window.innerHeight) - 200,
+        maxY: 100,
+      }
+
+      const newX = Math.max(bounds.minX, Math.min(bounds.maxX, touchStartGridX - deltaX))
+      const newY = Math.max(bounds.minY, Math.min(bounds.maxY, touchStartGridY - deltaY))
+
+      gsap.set(grid, { x: newX, y: newY })
+    }
+
+    const handleTouchEnd = () => {
+      isTouching = false
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handleTouchEnd, { passive: true })
+  }
 }
 
 // Details functions
@@ -552,7 +622,15 @@ const handleMouseMove = (e) => {
 }
 
 const handleContainerClick = (e) => {
-  if (showDetails.value && e.clientX < getPanelBoundary()) {
+  // Su mobile, controlla anche touch events
+  const clientX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0
+
+  // Non chiudere se il click è su un'immagine (gestito da PaintingImg)
+  if (e.target.closest('.painting')) {
+    return
+  }
+
+  if (showDetails.value && clientX < getPanelBoundary()) {
     closeDetails()
   }
 }
@@ -628,6 +706,7 @@ onUnmounted(() => {
 
   transform-origin: center center;
   will-change: transform;
+  touch-action: pan-x pan-y;
 }
 
 .home-button {

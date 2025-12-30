@@ -78,30 +78,6 @@ const handleScroll = (e) => {
   }
 }
 
-// Gestione scroll su mobile con touch
-let touchStartY = 0
-let touchEndY = 0
-
-const handleTouchStart = (e) => {
-  touchStartY = e.touches[0].clientY
-}
-
-const handleTouchMove = (e) => {
-  if (hasNavigated.value) return
-  touchEndY = e.touches[0].clientY
-}
-
-const handleTouchEnd = () => {
-  if (hasNavigated.value) return
-
-  const deltaY = touchStartY - touchEndY
-  // Se lo scroll è verso il basso (deltaY positivo significa che touchStartY > touchEndY)
-  if (deltaY > 50) {
-    hasNavigated.value = true
-    emit('navigate', 'main')
-  }
-}
-
 // ===== HELPERS RESPONSIVE =====
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
@@ -287,21 +263,12 @@ onMounted(async () => {
   }
 
   window.addEventListener('wheel', handleScroll, { passive: false })
-
-  // Aggiungi listener per touch su mobile
-  window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchmove', handleTouchMove, { passive: true })
-  window.addEventListener('touchend', handleTouchEnd, { passive: true })
-
   animateTexts()
 })
 
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('wheel', handleScroll)
-  window.removeEventListener('touchstart', handleTouchStart)
-  window.removeEventListener('touchmove', handleTouchMove)
-  window.removeEventListener('touchend', handleTouchEnd)
   if (autoImageInterval.value) {
     clearInterval(autoImageInterval.value)
   }

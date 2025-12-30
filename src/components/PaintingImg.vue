@@ -32,6 +32,9 @@ const paintingRef = ref(null)
 
 const handleClick = (e) => {
   e.stopPropagation()
+  e.preventDefault()
+
+  // Su mobile, assicurati che funzioni anche con touch
   const imgElement = paintingRef.value?.querySelector('img')
   emit('click', {
     data: props.paintingData,
@@ -45,6 +48,8 @@ const handleClick = (e) => {
   position: relative;
   width: 18.5vw;
   aspect-ratio: 1 / 1;
+  touch-action: manipulation;
+  cursor: pointer;
 
   @media (max-width: 1024px) {
     width: 25vw;
