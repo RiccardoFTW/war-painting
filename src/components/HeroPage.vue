@@ -64,6 +64,7 @@ const startFromX = ref(0)
 const startFromY = ref(0)
 const allImages = ref([])
 const hasNavigated = ref(false)
+const autoImageInterval = ref(null)
 
 const emit = defineEmits(['navigate'])
 
@@ -84,13 +85,13 @@ const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
 const getThreshold = () => {
   if (isMobile()) return 80
   if (isTablet()) return 120
-  return 150
+  return 200
 }
 
 const getImageScale = () => {
   if (isMobile()) return 2
   if (isTablet()) return 2
-  return 2.5
+  return 3
 }
 
 const handleMouseMove = (e) => {
@@ -231,6 +232,16 @@ const animateTexts = async () => {
   })
 }
 
+// ===== AUTO IMAGE TRAIL FOR MOBILE =====
+const startAutoImageTrail = () => {
+  if (isMobile()) {
+    // Su mobile, mostra le immagini automaticamente ogni 2 secondi
+    autoImageInterval.value = setInterval(() => {
+      showNextImage()
+    }, 1500)
+  }
+}
+
 // ===== LIFECYCLE HOOKS =====
 onMounted(async () => {
   await nextTick()
@@ -239,7 +250,18 @@ onMounted(async () => {
     allImages.value = [...imgWrapper.querySelectorAll('.trail-image')]
   }
 
-  document.addEventListener('mousemove', handleMouseMove)
+  // Su mobile, automatizza l'image trail
+  if (isMobile()) {
+    startAutoImageTrail()
+    // Mostra la prima immagine dopo un breve delay
+    setTimeout(() => {
+      showNextImage()
+    }, 1000)
+  } else {
+    // Su desktop, usa il mouse
+    document.addEventListener('mousemove', handleMouseMove)
+  }
+
   window.addEventListener('wheel', handleScroll, { passive: false })
   animateTexts()
 })
@@ -247,6 +269,9 @@ onMounted(async () => {
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('wheel', handleScroll)
+  if (autoImageInterval.value) {
+    clearInterval(autoImageInterval.value)
+  }
   gsap.killTweensOf('.trail-image')
 })
 </script>
@@ -279,7 +304,7 @@ onUnmounted(() => {
   font-family: 'EB Garamond', ' Serif';
   font-style: italic;
   font-weight: 300;
-  font-size: clamp(0.875rem, 1vw, 1rem);
+  font-size: clamp(1rem, 1.2vw, 1rem);
   line-height: 1.5;
   text-align: center;
   opacity: 0;
@@ -311,7 +336,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 3rem;
+  gap: 10rem;
 
   @media (max-width: 768px) {
     gap: 0.5rem;
@@ -320,10 +345,14 @@ onUnmounted(() => {
 
 .hero__title h1 {
   font-family: 'EB Garamond', 'Serif';
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(8rem, 10vw, 8rem);
   font-weight: 300;
   line-height: 0.8;
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    font-size: clamp(3rem, 4vw, 3rem);
+  }
 }
 
 .footer {

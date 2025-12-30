@@ -79,6 +79,8 @@ const emit = defineEmits(['navigate'])
 const animateColumns = async () => {
   await nextTick()
 
+  const isMobile = window.innerWidth <= 768
+
   const timeline = gsap.timeline({
     onComplete: () => {
       // Dopo che tutte le animazioni sono completate, transizione verso HeroPage
@@ -92,6 +94,11 @@ const animateColumns = async () => {
   const columns = document.querySelectorAll('.column')
 
   columns.forEach((column, columnIndex) => {
+    // Su mobile, salta le colonne nascoste (dalla 5 in poi)
+    if (isMobile && columnIndex >= 4) {
+      return
+    }
+
     const texts = column.querySelectorAll('p')
 
     texts.forEach((text, textIndex) => {
@@ -104,8 +111,10 @@ const animateColumns = async () => {
       splits.push(split)
 
       // Calcola il timing: ogni colonna inizia dopo la precedente, ogni testo nella colonna è leggermente sfalsato
+      // Su mobile, riduciamo il delay tra colonne per velocizzare l'animazione
+      const columnDelay = isMobile ? 0.3 : 0.5
       const startTime =
-        columnIndex * 0.5 + // Delay tra colonne
+        columnIndex * columnDelay + // Delay tra colonne
         textIndex * 0.1 // Delay tra testi nella stessa colonna
 
       timeline.fromTo(
@@ -182,6 +191,7 @@ onMounted(async () => {
   line-height: 1.6;
   margin-bottom: 0.5rem;
   opacity: 0;
+  white-space: nowrap;
 }
 
 .text-black {
@@ -214,8 +224,26 @@ onMounted(async () => {
 
 @media (max-width: 768px) {
   .columns__container {
-    gap: 1rem;
-    padding: 0 0.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    justify-content: center;
+  }
+
+  .column {
+    flex: 0 0 calc(50% - 0.75rem);
+    min-width: 0;
+  }
+
+  .column:nth-child(n + 5) {
+    display: none;
+  }
+
+  .column p {
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.4;
   }
 }
 </style>
