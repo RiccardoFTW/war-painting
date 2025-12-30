@@ -78,6 +78,41 @@ const handleScroll = (e) => {
   }
 }
 
+// Gestione scroll su mobile con touch
+let touchStartY = 0
+let touchEndY = 0
+let touchStartTime = 0
+
+const handleTouchStart = (e) => {
+  if (hasNavigated.value) return
+  touchStartY = e.touches[0].clientY
+  touchStartTime = Date.now()
+}
+
+const handleTouchMove = (e) => {
+  if (hasNavigated.value) return
+  touchEndY = e.touches[0].clientY
+}
+
+const handleTouchEnd = () => {
+  if (hasNavigated.value) return
+
+  const deltaY = touchStartY - touchEndY
+  const touchDuration = Date.now() - touchStartTime
+
+  // Se lo scroll è verso il basso (deltaY positivo) e il movimento è significativo
+  // oppure se è uno swipe veloce verso il basso
+  if (deltaY > 50 || (deltaY > 30 && touchDuration < 300)) {
+    hasNavigated.value = true
+    emit('navigate', 'main')
+  }
+
+  // Reset
+  touchStartY = 0
+  touchEndY = 0
+  touchStartTime = 0
+}
+
 // ===== HELPERS RESPONSIVE =====
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
@@ -263,12 +298,25 @@ onMounted(async () => {
   }
 
   window.addEventListener('wheel', handleScroll, { passive: false })
+
+  // Su mobile, aggiungi listener per touch scroll
+  if (isMobile()) {
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handleTouchEnd, { passive: true })
+  }
+
   animateTexts()
 })
 
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('wheel', handleScroll)
+  if (isMobile()) {
+    window.removeEventListener('touchstart', handleTouchStart)
+    window.removeEventListener('touchmove', handleTouchMove)
+    window.removeEventListener('touchend', handleTouchEnd)
+  }
   if (autoImageInterval.value) {
     clearInterval(autoImageInterval.value)
   }
