@@ -104,8 +104,8 @@ const getThreshold = () => {
  * Scala delle immagini nell'animazione
  */
 const getImageScale = () => {
-  if (isMobile()) return 2
-  if (isTablet()) return 2
+  if (isMobile()) return 3
+  if (isTablet()) return 3
   return 3
 }
 
