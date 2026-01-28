@@ -1,19 +1,4 @@
-<!--
-  MainContainer.vue - Container principale della griglia dipinti
-
-  Funzionalità:
-  - Griglia draggabile di dipinti
-  - Pannello dettagli con animazione FLIP
-  - Scroll smooth con Lenis (desktop) e touch (mobile)
-  - Animazione intro con zoom
-  - Bottone Home per tornare a HeroPage
-
-  Struttura:
-  - MainGrid: griglia di colonne con i dipinti
-  - PaintingDetails: pannello laterale con dettagli dipinto
--->
 <template>
-  <!-- Container principale della griglia -->
   <div class="container" ref="containerRef" @click="handleContainerClick">
     <MainGrid
       ref="mainGridRef"
@@ -29,14 +14,12 @@
     />
   </div>
 
-  <!-- Bottone Home (fuori dal container per evitare interferenze) -->
   <div ref="homeButtonRef" class="home-button" @click.stop="goToHero">
     <h2>Home</h2>
   </div>
 </template>
 
 <script setup>
-// ===== IMPORTS =====
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import MainGrid from './MainGrid.vue'
 import PaintingDetails from './PaintingDetails.vue'
@@ -44,63 +27,54 @@ import { Draggable, Flip, SplitText } from 'gsap/all'
 import gsap from 'gsap'
 import paintingsData from '../data/paintings.json'
 
-// Registra i plugin GSAP
 gsap.registerPlugin(Draggable, Flip, SplitText)
 
 // ===== EVENTI =====
 const emit = defineEmits(['navigate'])
 
 // ===== STATO REATTIVO =====
-// Riferimenti DOM
 const containerRef = ref(null)
 const mainGridRef = ref(null)
 const paintingDetailsRef = ref(null)
 const homeButtonRef = ref(null)
-
-// Stato UI
-const isDragging = ref(false) // Indica se la griglia è in drag
-const showDetails = ref(false) // Mostra/nasconde pannello dettagli
-const currentPainting = ref(null) // Dipinto selezionato
-const isClosing = ref(false) // Animazione chiusura in corso
-const isAnimating = ref(false) // Animazione intro in corso
-
-// Stato per FLIP animation
+const isDragging = ref(false)
+const showDetails = ref(false)
+const currentPainting = ref(null)
+const isClosing = ref(false)
+const isAnimating = ref(false)
 const currentPaintingElement = ref(null)
 const originalParent = ref(null)
 const originalGridPosition = ref({ x: 0, y: 0 })
-
-// Istanze SplitText (per cleanup)
 let titleSplit = null
 let descSplit = null
 
-// ===== SMOOTH SCROLL STATE =====
-// Variabili per lo smooth scroll custom
+
 let targetX = 0
 let targetY = 0
 let currentX = 0
 let currentY = 0
 let rafId = null
-const LERP_FACTOR = 0.08 // Fattore di interpolazione (più basso = più smooth)
+const LERP_FACTOR = 0.08
 
 // ===== HELPERS RESPONSIVE =====
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
 
-/** Larghezza pannello dettagli in base al dispositivo */
+
 const getDetailsPanelWidth = () => {
   if (isMobile()) return '100%'
   if (isTablet()) return '60vw'
   return '50vw'
 }
 
-/** Spostamento griglia quando si apre il pannello */
+
 const getGridShift = () => {
   if (isMobile()) return '-=20vw'
   if (isTablet()) return '-=40vw'
   return '-=50vw'
 }
 
-/** Confine del pannello per gestire click */
+
 const getPanelBoundary = () => {
   if (isMobile()) return window.innerWidth * 0.8
   if (isTablet()) return window.innerWidth * 0.6
@@ -108,7 +82,6 @@ const getPanelBoundary = () => {
 }
 
 // ===== NAVIGAZIONE =====
-/** Torna alla HeroPage */
 const goToHero = (e) => {
   if (e) {
     e.preventDefault()
@@ -119,8 +92,6 @@ const goToHero = (e) => {
   return false
 }
 
-// ===== GRIGLIA: POSIZIONAMENTO E SETUP =====
-/** Centra la griglia nella viewport */
 const centerGrid = () => {
   const grid = mainGridRef.value?.gridRef
   if (!grid) return
@@ -133,7 +104,6 @@ const centerGrid = () => {
   gsap.set(grid, { x: centerX, y: centerY })
 }
 
-/** Animazione intro: zoom della griglia con stagger sui dipinti */
 const intro = async () => {
   await nextTick()
 
@@ -143,7 +113,7 @@ const intro = async () => {
 
   if (!grid) return
 
-  // Blocca scroll durante l'animazione
+
   isAnimating.value = true
   document.body.style.overflow = 'hidden'
   document.body.style.position = 'fixed'
@@ -151,12 +121,12 @@ const intro = async () => {
 
   const timeline = gsap.timeline()
 
-  // Stato iniziale: container scalato, dipinti nascosti
+
   timeline.set(containerRef.value, { scale: 0.5 })
   timeline.set(paintings, { scale: 0.5, opacity: 0 })
   if (details) timeline.set(details, { opacity: 0 })
 
-  // Animazione dipinti con stagger random
+
   timeline.to(paintings, {
     scale: 1,
     opacity: 1,
@@ -165,7 +135,7 @@ const intro = async () => {
     stagger: { amount: 1.2, from: 'random' },
   })
 
-  // Zoom container
+
   timeline.to(
     containerRef.value,
     {
@@ -175,7 +145,7 @@ const intro = async () => {
       onComplete: () => {
         if (details) gsap.set(details, { opacity: 1 })
 
-        // Mostra bottone Home con animazione
+
         if (homeButtonRef.value) {
           gsap.fromTo(
             homeButtonRef.value,
@@ -184,7 +154,6 @@ const intro = async () => {
           )
         }
 
-        // Sblocca scroll
         isAnimating.value = false
         document.body.style.overflow = ''
         document.body.style.position = ''
@@ -196,12 +165,10 @@ const intro = async () => {
 }
 
 // ===== DRAG (SOLO DESKTOP) =====
-/** Setup del drag della griglia con GSAP Draggable */
 const setupDraggable = () => {
   const grid = mainGridRef.value?.gridRef
   if (!grid) return
 
-  // Su mobile non usiamo Draggable (usiamo touch scroll)
   if (isMobile()) return
 
   Draggable.create(grid, {
@@ -225,18 +192,12 @@ const setupDraggable = () => {
 }
 
 // ===== SMOOTH SCROLL =====
-/**
- * Inizializza lo smooth scroll custom
- * Usa interpolazione lineare (lerp) per movimento fluido
- */
 const initSmoothScroll = () => {
-  // Su mobile usiamo touch scroll, su desktop smooth scroll
   if (isMobile()) return
 
   const grid = mainGridRef.value?.gridRef
   if (!grid) return
 
-  // Calcola i bounds della griglia
   const getBounds = () => ({
     minX: -(grid.offsetWidth - window.innerWidth) - 200,
     maxX: 200,
@@ -244,35 +205,27 @@ const initSmoothScroll = () => {
     maxY: 100,
   })
 
-  // Limita un valore tra min e max
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
 
-  // Inizializza posizione corrente dalla griglia
   currentX = gsap.getProperty(grid, 'x') || 0
   currentY = gsap.getProperty(grid, 'y') || 0
   targetX = currentX
   targetY = currentY
 
-  // Gestisce l'evento wheel/trackpad
   const handleWheel = (e) => {
     e.preventDefault()
 
-    // Non scrollare se dettagli aperti o animazione in corso
     if (showDetails.value || isClosing.value || isAnimating.value || isDragging.value) return
 
     const bounds = getBounds()
 
-    // Accumula il delta nel target (moltiplicatore per sensibilità)
     const multiplier = 2.5
     targetX = clamp(targetX - e.deltaX * multiplier, bounds.minX, bounds.maxX)
     targetY = clamp(targetY - e.deltaY * multiplier, bounds.minY, bounds.maxY)
   }
 
-  // Loop di animazione - interpola verso il target
   const animate = () => {
-    // Non animare durante il drag
     if (isDragging.value) {
-      // Sincronizza target con posizione corrente del drag
       currentX = gsap.getProperty(grid, 'x') || 0
       currentY = gsap.getProperty(grid, 'y') || 0
       targetX = currentX
@@ -281,20 +234,16 @@ const initSmoothScroll = () => {
       return
     }
 
-    // Interpolazione lineare (lerp)
     currentX += (targetX - currentX) * LERP_FACTOR
     currentY += (targetY - currentY) * LERP_FACTOR
 
-    // Applica la posizione alla griglia
     gsap.set(grid, { x: currentX, y: currentY })
 
     rafId = requestAnimationFrame(animate)
   }
 
-  // Aggiungi listener wheel
   window.addEventListener('wheel', handleWheel, { passive: false })
 
-  // Avvia il loop di animazione
   rafId = requestAnimationFrame(animate)
 }
 
@@ -305,7 +254,6 @@ const addTouchScrollListener = () => {
   const grid = mainGridRef.value?.gridRef
   if (!grid) return
 
-  // Calcola i bounds della griglia
   const getBounds = () => ({
     minX: -(grid.offsetWidth - window.innerWidth) - 200,
     maxX: 200,
@@ -347,7 +295,6 @@ const addTouchScrollListener = () => {
     const deltaY = touchStartY - currentY
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-    // Se il movimento è > 10px, è uno scroll (non un tap)
     if (distance > 10) {
       if (!isScrolling) isScrolling = true
       e.preventDefault()
@@ -371,7 +318,6 @@ const addTouchScrollListener = () => {
     const finalDeltaY = touchStartY - currentY
     const finalDistance = Math.sqrt(finalDeltaX * finalDeltaX + finalDeltaY * finalDeltaY)
 
-    // Aggiungi inerzia se era uno scroll
     if (isScrolling && finalDistance > 10) {
       const velocity = finalDistance / Math.max(touchDuration, 1)
       const inertiaX = finalDeltaX * velocity * 0.2
@@ -383,7 +329,6 @@ const addTouchScrollListener = () => {
       const newX = clamp(currentGridX - inertiaX, bounds.minX, bounds.maxX)
       const newY = clamp(currentGridY - inertiaY, bounds.minY, bounds.maxY)
 
-      // Durata basata sulla velocità
       const inertiaDuration = Math.min(1, velocity * 0.4)
 
       touchMoveAnimation = gsap.to(grid, {
@@ -404,7 +349,6 @@ const addTouchScrollListener = () => {
 }
 
 // ===== DETTAGLI DIPINTO =====
-/** Apre il pannello dettagli per un dipinto */
 const openDetails = (clickData) => {
   if (showDetails.value) {
     closeDetails()
@@ -414,7 +358,6 @@ const openDetails = (clickData) => {
   currentPainting.value = clickData.data
   showDetails.value = true
 
-  // Salva posizione griglia per il ritorno
   const grid = mainGridRef.value?.gridRef
   if (grid) {
     originalGridPosition.value = {
@@ -429,12 +372,10 @@ const openDetails = (clickData) => {
     const description = document.querySelector('.details__body p')
     const cross = document.querySelector('.cross')
 
-    // Prepara elementi per animazione
     if (title) gsap.set(title, { opacity: 0 })
     if (description) gsap.set(description, { opacity: 0 })
     if (cross) gsap.set(cross, { scale: 1, opacity: 0 })
 
-    // Sposta la griglia
     if (grid) {
       gsap.to(grid, {
         x: getGridShift(),
@@ -444,7 +385,6 @@ const openDetails = (clickData) => {
       })
     }
 
-    // Anima entrata pannello
     if (details) {
       gsap.fromTo(
         details,
@@ -454,17 +394,13 @@ const openDetails = (clickData) => {
     }
   })
 
-  // FLIP: sposta l'immagine nel pannello
   flipProduct(clickData.element)
 
-  // Anima i testi dopo che il pannello è entrato
   setTimeout(() => animateTexts(), 1200)
 
-  // Attiva cursor cross
   window.addEventListener('mousemove', handleMouseMove)
 }
 
-/** Chiude il pannello dettagli */
 const closeDetails = () => {
   isClosing.value = true
 
@@ -474,12 +410,10 @@ const closeDetails = () => {
 
   const timeline = gsap.timeline()
 
-  // Nascondi cursore cross
   if (cross) {
     timeline.to(cross, { scale: 0, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
   }
 
-  // Anima uscita titolo
   if (titleSplit?.chars) {
     timeline.to(
       titleSplit.chars,
@@ -488,7 +422,6 @@ const closeDetails = () => {
     )
   }
 
-  // Anima uscita descrizione
   if (descSplit?.lines) {
     timeline.to(
       descSplit.lines,
@@ -497,7 +430,6 @@ const closeDetails = () => {
     )
   }
 
-  // Riporta griglia alla posizione originale
   if (grid) {
     const currentX = gsap.getProperty(grid, 'x')
     const shiftMultiplier = isMobile() ? 0.2 : isTablet() ? 0.4 : 0.5
@@ -506,15 +438,12 @@ const closeDetails = () => {
     timeline.to(grid, { x: targetX, duration: 1.2, ease: 'power3.inOut' }, 0.3)
   }
 
-  // Anima uscita pannello
   if (details) {
     timeline.to(details, { x: getDetailsPanelWidth(), duration: 1.2, ease: 'power3.inOut' }, 0.3)
   }
 
-  // FLIP: riporta immagine nella griglia
   timeline.call(() => unFlipProduct(), null, 0.6)
 
-  // Cleanup
   timeline.call(
     () => {
       if (titleSplit) {
@@ -538,7 +467,6 @@ const closeDetails = () => {
 }
 
 // ===== FLIP ANIMATION =====
-/** Anima l'immagine dalla griglia al pannello dettagli */
 const flipProduct = (clickedElement) => {
   const detailsThumb = document.querySelector('.details__thumb')
   if (!detailsThumb || !clickedElement) return
@@ -546,14 +474,11 @@ const flipProduct = (clickedElement) => {
   currentPaintingElement.value = clickedElement
   originalParent.value = clickedElement.parentNode
 
-  // Cattura stato iniziale
   const state = Flip.getState(clickedElement)
 
-  // Sposta nel pannello
   detailsThumb.appendChild(clickedElement)
   gsap.set(clickedElement, { width: '100%', height: '100%' })
 
-  // Anima la transizione
   Flip.from(state, {
     absolute: true,
     duration: 1.4,
@@ -561,14 +486,11 @@ const flipProduct = (clickedElement) => {
     simple: true,
   })
 }
-
-/** Riporta l'immagine nella griglia */
 const unFlipProduct = () => {
   if (!currentPaintingElement.value || !originalParent.value) return
 
   const state = Flip.getState(currentPaintingElement.value)
 
-  // Riporta nel parent originale
   originalParent.value.appendChild(currentPaintingElement.value)
 
   Flip.from(state, {
@@ -585,16 +507,13 @@ const unFlipProduct = () => {
 }
 
 // ===== ANIMAZIONE TESTI DETTAGLI =====
-/** Anima titolo e descrizione nel pannello */
 const animateTexts = () => {
   const title = document.querySelector('.details__title p')
   const description = document.querySelector('.details__body p')
 
-  // Cleanup precedenti
   if (titleSplit) titleSplit.revert()
   if (descSplit) descSplit.revert()
 
-  // Anima titolo
   if (title) {
     gsap.set(title, { opacity: 1 })
     titleSplit = new SplitText(title, { type: 'chars', charsClass: 'char' })
@@ -605,8 +524,6 @@ const animateTexts = () => {
       { y: 0, opacity: 1, duration: 1.4, delay: 0.8, ease: 'power3.out', stagger: 0.015 },
     )
   }
-
-  // Anima descrizione (per linee)
   if (description) {
     gsap.set(description, { opacity: 1 })
     descSplit = new SplitText(description, { type: 'lines', linesClass: 'line' })
@@ -620,7 +537,6 @@ const animateTexts = () => {
 }
 
 // ===== GESTIONE CURSORE CROSS =====
-/** Mostra/nasconde il cursore cross in base alla posizione */
 const handleMouseMove = (e) => {
   if (!showDetails.value) return
 
@@ -643,11 +559,9 @@ const handleMouseMove = (e) => {
 }
 
 // ===== GESTIONE CLICK CONTAINER =====
-/** Chiude i dettagli se si clicca fuori dal pannello */
 const handleContainerClick = (e) => {
   const clientX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0
 
-  // Non chiudere se click su un dipinto
   if (e.target.closest('.painting')) return
 
   if (showDetails.value && clientX < getPanelBoundary()) {
@@ -656,7 +570,6 @@ const handleContainerClick = (e) => {
 }
 
 // ===== INTERSECTION OBSERVER =====
-/** Osserva i dipinti per applicare effetti quando entrano/escono dalla viewport */
 const observeProducts = () => {
   const paintings = document.querySelectorAll('.painting')
   if (paintings.length === 0) return
@@ -685,7 +598,6 @@ onMounted(async () => {
   centerGrid()
   setupDraggable()
 
-  // Inizializza smooth scroll su desktop, touch scroll su mobile
   if (!isMobile()) {
     initSmoothScroll()
   } else {
@@ -694,20 +606,16 @@ onMounted(async () => {
 
   observeProducts()
 
-  // Event listener extra per il bottone Home
   if (homeButtonRef.value) {
     homeButtonRef.value.addEventListener('click', goToHero)
   }
 })
 
 onUnmounted(() => {
-  // Cleanup animation frame
   if (rafId) {
     cancelAnimationFrame(rafId)
     rafId = null
   }
-
-  // Rimuovi listener wheel
   window.removeEventListener('wheel', () => {})
 
   if (homeButtonRef.value) {
@@ -717,7 +625,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Container principale - fixed per coprire la viewport */
 .container {
   position: fixed;
   width: 100vw;
@@ -729,7 +636,6 @@ onUnmounted(() => {
   touch-action: pan-x pan-y;
 }
 
-/* Bottone Home - fisso in alto a sinistra */
 .home-button {
   position: fixed;
   top: 2rem;
@@ -738,7 +644,7 @@ onUnmounted(() => {
   cursor: pointer;
   pointer-events: auto;
   user-select: none;
-  opacity: 0; /* Nascosto inizialmente, animato dopo intro */
+  opacity: 0;
 }
 
 .home-button h2 {
@@ -749,7 +655,6 @@ onUnmounted(() => {
   color: #c49852;
 }
 
-/* Pseudo-elemento per effetto sfondo (opzionale) */
 .container::before {
   content: '';
   position: fixed;
@@ -765,7 +670,6 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* Stato iniziale per SplitText */
 .line,
 .char {
   transform: translate3d(0, 100%, 0);

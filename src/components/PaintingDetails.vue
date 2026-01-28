@@ -1,41 +1,22 @@
-<!--
-  PaintingDetails.vue - Pannello dettagli dipinto
-
-  Mostra:
-  - Thumbnail del dipinto (animata con FLIP)
-  - Titolo del dipinto
-  - Metadati: artista, anno, location
-  - Descrizione
-
-  Include anche il cursore "cross" per chiudere
--->
 <template>
-  <!-- Pannello dettagli -->
   <div class="details" :class="{ '--is-showing': isVisible }">
-    <!-- Container per l'immagine (target del FLIP) -->
     <div class="details__thumb"></div>
 
     <div class="details__content">
-      <!-- Titolo -->
       <div class="details__title">
         <p :data-title="currentPainting?.id">{{ currentPainting?.title }}</p>
       </div>
-
-      <!-- Metadati -->
       <div class="details__meta">
         <p class="meta__artist">{{ currentPainting?.artist }}</p>
         <p class="meta__year">{{ currentPainting?.year }}</p>
         <p class="meta__location">{{ currentPainting?.Location }}</p>
       </div>
 
-      <!-- Descrizione -->
       <div class="details__body">
         <p :data-desc="currentPainting?.id">{{ currentPainting?.description }}</p>
       </div>
     </div>
   </div>
-
-  <!-- Cursore cross per chiudere (segue il mouse) -->
   <div class="cross" @click="closeDetails">
     <span></span>
     <span></span>
@@ -43,7 +24,6 @@
 </template>
 
 <script setup>
-// ===== PROPS =====
 defineProps({
   isVisible: {
     type: Boolean,
@@ -55,18 +35,13 @@ defineProps({
   },
 })
 
-// ===== EVENTI =====
 const emit = defineEmits(['close'])
-
-// ===== METODI =====
-/** Emette evento per chiudere il pannello */
 const closeDetails = () => {
   emit('close')
 }
 </script>
 
 <style scoped>
-/* ===== PANNELLO DETTAGLI ===== */
 .details {
   position: fixed;
   top: 0;
@@ -76,7 +51,7 @@ const closeDetails = () => {
   padding: 3vw 4vw;
   background-color: #f1f1f1;
   opacity: 1;
-  transform: translate3d(100%, 0, 0); /* Nascosto fuori schermo */
+  transform: translate3d(100%, 0, 0);
   z-index: 9999;
   will-change: transform;
 
@@ -90,8 +65,6 @@ const closeDetails = () => {
     padding: 6vw 5vw;
   }
 }
-
-/* Container thumbnail - qui viene spostata l'immagine con FLIP */
 .details__thumb {
   position: relative;
   width: 100%;
@@ -117,8 +90,6 @@ const closeDetails = () => {
   height: 100%;
   object-fit: cover;
 }
-
-/* ===== TITOLO ===== */
 .details__title {
   font-family: 'EB Garamond', serif;
   font-style: italic;
@@ -145,8 +116,6 @@ const closeDetails = () => {
     font-size: clamp(1.3rem, 5vw, 2rem);
   }
 }
-
-/* ===== METADATI ===== */
 .details__meta {
   font-family: 'EB Garamond', serif;
   margin-bottom: 2vw;
@@ -172,8 +141,6 @@ const closeDetails = () => {
   opacity: 0.7;
   font-size: clamp(0.8rem, 1vw, 1rem);
 }
-
-/* ===== DESCRIZIONE ===== */
 .details__body {
   display: flex;
   flex-wrap: wrap;
@@ -197,8 +164,6 @@ const closeDetails = () => {
     line-height: 1.5;
   }
 }
-
-/* ===== CURSORE CROSS ===== */
 .cross {
   position: fixed;
   top: 0;
@@ -207,7 +172,7 @@ const closeDetails = () => {
   height: 40px;
   cursor: pointer;
   z-index: 10000;
-  transform: scale(0); /* Nascosto inizialmente */
+  transform: scale(0);
   pointer-events: none;
 
   @media (max-width: 768px) {
@@ -215,8 +180,6 @@ const closeDetails = () => {
     height: 50px;
   }
 }
-
-/* Linee del cross */
 .cross span {
   position: absolute;
   width: 100%;

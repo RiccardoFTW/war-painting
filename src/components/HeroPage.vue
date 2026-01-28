@@ -1,21 +1,5 @@
-<!--
-  HeroPage.vue - Homepage principale
-
-  Contiene:
-  - Navbar con info progetto
-  - Titolo "WAR ON CANVAS" centrato
-  - Footer con credits
-  - Image trail: immagini che appaiono al centro dello schermo
-    - Desktop: attivato dal movimento del mouse
-    - Mobile: automatico ogni 1.5 secondi
-
-  Navigazione verso MainContainer:
-  - Desktop: scroll down con rotella
-  - Mobile: swipe down
--->
 <template>
   <div class="hero__container">
-    <!-- Titolo principale -->
     <div class="hero__title">
       <div class="title__container">
         <h1 class="title__one">War</h1>
@@ -24,7 +8,6 @@
       </div>
     </div>
 
-    <!-- Footer con credits -->
     <div class="footer">
       <p>Made in Vue + GSAP</p>
       <p>
@@ -60,10 +43,6 @@ import paintingsData from '../data/paintings.json'
 gsap.registerPlugin(SplitText)
 
 // ===== COMPUTED: IMMAGINI PER L'IMAGE TRAIL =====
-/**
- * Genera un array di immagini randomizzate per l'effetto trail
- * Usa import.meta.url per risolvere correttamente i path in produzione
- */
 const images = computed(() => {
   const shuffled = [...paintingsData.paintings].sort(() => Math.random() - 0.5)
   return shuffled.slice(0, 40).map((painting) => {
@@ -76,12 +55,12 @@ const images = computed(() => {
 })
 
 // ===== STATO REATTIVO =====
-const imgNum = ref(0) // Indice dell'immagine corrente nell'image trail
-const startFromX = ref(0) // Posizione X di partenza per calcolare il movimento
-const startFromY = ref(0) // Posizione Y di partenza per calcolare il movimento
-const allImages = ref([]) // Array di elementi DOM delle immagini
-const hasNavigated = ref(false) // Previene navigazioni multiple
-const autoImageInterval = ref(null) // Intervallo per l'auto-trail su mobile
+const imgNum = ref(0)
+const startFromX = ref(0)
+const startFromY = ref(0)
+const allImages = ref([])
+const hasNavigated = ref(false)
+const autoImageInterval = ref(null)
 
 // ===== EVENTI =====
 const emit = defineEmits(['navigate'])
@@ -90,30 +69,20 @@ const emit = defineEmits(['navigate'])
 const isMobile = () => window.innerWidth <= 768
 const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024
 
-/**
- * Soglia di movimento per attivare una nuova immagine
- * Più piccola su mobile per compensare schermi più piccoli
- */
 const getThreshold = () => {
   if (isMobile()) return 80
   if (isTablet()) return 120
   return 200
 }
 
-/**
- * Scala delle immagini nell'animazione
- */
+
 const getImageScale = () => {
   if (isMobile()) return 3
   if (isTablet()) return 3
-  return 3
+  return 2.5
 }
 
 // ===== GESTIONE SCROLL (DESKTOP) =====
-/**
- * Gestisce lo scroll con rotella del mouse
- * Scroll down naviga verso MainContainer
- */
 const handleScroll = (e) => {
   if (hasNavigated.value) return
 
@@ -139,17 +108,13 @@ const handleTouchMove = (e) => {
   touchEndY = e.touches[0].clientY
 }
 
-/**
- * Gestisce la fine del touch
- * Naviga se lo swipe è verso il basso e supera la soglia
- */
 const handleTouchEnd = () => {
   if (hasNavigated.value) return
 
   const deltaY = touchStartY - touchEndY
   const touchDuration = Date.now() - touchStartTime
 
-  // Naviga se: swipe > 50px OPPURE swipe > 30px e veloce (< 300ms)
+
   if (deltaY > 50 || (deltaY > 30 && touchDuration < 300)) {
     hasNavigated.value = true
     emit('navigate', 'main')
@@ -162,44 +127,31 @@ const handleTouchEnd = () => {
 }
 
 // ===== IMAGE TRAIL =====
-/**
- * Gestisce il movimento del mouse per l'image trail
- * Mostra una nuova immagine quando il mouse si muove oltre la soglia
- */
 const handleMouseMove = (e) => {
   const x = e.clientX
   const y = e.clientY
   const threshold = getThreshold()
 
-  // Verifica se il mouse ha superato la soglia in qualsiasi direzione
   const hasCrossedThreshold =
     Math.abs(x - startFromX.value) > threshold || Math.abs(y - startFromY.value) > threshold
 
   if (hasCrossedThreshold) {
     showNextImage()
-    // Aggiorna la posizione di partenza
     startFromX.value = x
     startFromY.value = y
   }
 }
 
-/**
- * Mostra l'immagine successiva nell'image trail
- * Animazione smooth: fade in con scale -> fade out con blur
- */
 const showNextImage = () => {
   if (!allImages.value.length) return
 
-  // Ferma tutte le animazioni e nascondi immediatamente
   gsap.killTweensOf('.trail-image')
   allImages.value.forEach((img) => gsap.set(img, { opacity: 0 }))
 
-  // Seleziona l'immagine corrente
   const movingImage = allImages.value[imgNum.value]
   const centerX = window.innerWidth / 2
   const centerY = window.innerHeight / 2
 
-  // Posiziona al centro
   gsap.set(movingImage, {
     left: centerX,
     top: centerY,
@@ -207,7 +159,7 @@ const showNextImage = () => {
     scale: getImageScale() * 0.85,
   })
 
-  // Fade in
+
   gsap.to(movingImage, {
     opacity: 1,
     scale: getImageScale(),
@@ -215,21 +167,15 @@ const showNextImage = () => {
     ease: 'power3.out',
   })
 
-  // Passa all'immagine successiva (loop circolare)
   imgNum.value = (imgNum.value + 1) % allImages.value.length
 }
 
 // ===== ANIMAZIONE TESTI =====
-/**
- * Anima navbar e footer con SplitText
- * I caratteri appaiono dal basso con stagger
- */
 const animateTexts = async () => {
   await nextTick()
 
   const timeline = gsap.timeline()
 
-  // Anima testi della navbar
   document.querySelectorAll('.navbar p').forEach((text, index) => {
     gsap.set(text, { opacity: 1 })
 
@@ -243,7 +189,6 @@ const animateTexts = async () => {
     )
   })
 
-  // Anima testi del footer
   document.querySelectorAll('.footer p').forEach((text, index) => {
     gsap.set(text, { opacity: 1 })
 
@@ -259,10 +204,6 @@ const animateTexts = async () => {
 }
 
 // ===== AUTO IMAGE TRAIL (MOBILE) =====
-/**
- * Su mobile, avvia l'image trail automatico
- * Le immagini cambiano ogni 1.5 secondi
- */
 const startAutoImageTrail = () => {
   if (isMobile()) {
     autoImageInterval.value = setInterval(showNextImage, 1500)
@@ -273,7 +214,6 @@ const startAutoImageTrail = () => {
 onMounted(async () => {
   await nextTick()
 
-  // Raccoglie tutti gli elementi immagine
   const imgWrapper = document.querySelector('.img-wrapper')
   if (imgWrapper) {
     allImages.value = [...imgWrapper.querySelectorAll('.trail-image')]
@@ -281,27 +221,21 @@ onMounted(async () => {
 
   // Setup in base al dispositivo
   if (isMobile()) {
-    // Mobile: image trail automatico + touch scroll
     startAutoImageTrail()
-    setTimeout(showNextImage, 1000) // Prima immagine dopo 1s
+    setTimeout(showNextImage, 1000)
 
     window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
     window.addEventListener('touchend', handleTouchEnd, { passive: true })
   } else {
-    // Desktop: image trail su movimento mouse
     document.addEventListener('mousemove', handleMouseMove)
   }
-
-  // Scroll con rotella (funziona anche su desktop)
   window.addEventListener('wheel', handleScroll, { passive: false })
 
-  // Anima i testi
   animateTexts()
 })
 
 onUnmounted(() => {
-  // Cleanup di tutti i listener
   document.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('wheel', handleScroll)
 
@@ -311,18 +245,15 @@ onUnmounted(() => {
     window.removeEventListener('touchend', handleTouchEnd)
   }
 
-  // Ferma l'intervallo automatico
   if (autoImageInterval.value) {
     clearInterval(autoImageInterval.value)
   }
 
-  // Ferma tutte le animazioni delle immagini
   gsap.killTweensOf('.trail-image')
 })
 </script>
 
 <style scoped>
-/* Container principale - fixed per coprire tutta la viewport */
 .hero__container {
   position: fixed;
   top: 0;
@@ -334,20 +265,19 @@ onUnmounted(() => {
   align-items: center;
   justify-content: flex-start;
   z-index: 10;
-  pointer-events: none; /* Permette click-through tranne dove specificato */
+  pointer-events: none;
 }
 
-/* ===== TITOLO ===== */
 .hero__title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0.8rem;
+  padding: 1rem;
   width: 100%;
-  margin-top: 0.5rem; /* Titolo in alto */
-  margin-bottom: auto; /* Spinge il footer in basso */
+  margin-top: 0.5rem;
+  margin-bottom: auto;
   pointer-events: auto;
-  color: #c49852; /* Oro */
+  color: #c49852;
 
   @media (max-width: 768px) {
     gap: 1rem;
@@ -357,7 +287,7 @@ onUnmounted(() => {
 .title__container {
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start; /* Allinea i titoli in alto */
+  align-items: flex-start;
   gap: 1rem;
 
   @media (max-width: 768px) {
@@ -383,7 +313,6 @@ onUnmounted(() => {
   font-size: clamp(2rem, 3vw, 2rem) !important;
 }
 
-/* ===== FOOTER ===== */
 .footer {
   width: 100%;
   padding: 0 0.8rem;
@@ -400,7 +329,7 @@ onUnmounted(() => {
   font-size: clamp(0.875rem, 1vw, 1rem);
   line-height: 1.5;
   text-align: center;
-  opacity: 0; /* Nascosto inizialmente */
+  opacity: 0;
 
   @media (max-width: 768px) {
     font-size: clamp(0.8rem, 1vw, 0.8rem);
@@ -411,14 +340,13 @@ onUnmounted(() => {
   color: #c49852;
 }
 
-/* ===== IMAGE TRAIL ===== */
 .trail-image {
   position: absolute;
   width: 200px;
   height: auto;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%); /* Centra rispetto al punto */
+  transform: translate(-50%, -50%);
 
   @media (max-width: 1024px) {
     width: 150px;
@@ -429,7 +357,6 @@ onUnmounted(() => {
   }
 }
 
-/* Stato iniziale per SplitText */
 .char {
   transform: translate3d(0, 100%, 0);
 }

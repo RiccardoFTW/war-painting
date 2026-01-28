@@ -1,9 +1,3 @@
-<!--
-  MainColumn.vue - Colonna singola della griglia
-
-  Contiene una lista verticale di dipinti.
-  Le colonne pari hanno un offset verticale per effetto sfalsato.
--->
 <template>
   <div class="column">
     <PaintingImg
@@ -34,10 +28,6 @@ defineProps({
 const emit = defineEmits(['painting-click'])
 
 // ===== METODI =====
-/**
- * Risolve il path dell'immagine per Vite
- * Usa import.meta.url per funzionare correttamente in produzione
- */
 const getImagePath = (imagePath) => {
   if (!imagePath) return ''
 
@@ -50,30 +40,28 @@ const getImagePath = (imagePath) => {
   }
 }
 
-/** Propaga l'evento click al parent */
 const handlePaintingClick = (clickData) => {
   emit('painting-click', clickData)
 }
 </script>
 
 <style scoped>
-/* Colonna verticale di dipinti */
 .column {
   display: flex;
   flex-direction: column;
   gap: 10vw;
 
   @media (max-width: 768px) {
-    gap: 25vw; /* Più spazio verticale su mobile */
+    gap: 25vw;
   }
 }
 
-/* Colonne pari: offset verticale per effetto sfalsato */
+
 .column:nth-child(even) {
   margin-top: 10vw;
 
   @media (max-width: 768px) {
-    margin-top: 30vw; /* Offset maggiore su mobile */
+    margin-top: 30vw;
   }
 }
 </style>

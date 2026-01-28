@@ -2,7 +2,7 @@
   IntroPage.vue - Loader iniziale
 
   Mostra un contatore percentuale che va da 0 a 100
-  Al termine, naviga automaticamente verso HeroPage
+  Quando arriva a 100, parte la transizione verso HeroPage
 -->
 <template>
   <div class="loader" ref="loaderRef">
@@ -28,48 +28,21 @@ const startLoader = () => {
   // Oggetto per animare il valore numerico
   const counter = { value: 0 }
 
-  // Timeline principale
-  const tl = gsap.timeline()
-
   // Animazione contatore da 0 a 100
-  tl.to(counter, {
+  gsap.to(counter, {
     value: 100,
-    duration: 2.5, // Durata del conteggio
+    duration: 2.5,
     ease: 'power3.inOut',
     onUpdate: () => {
-      // Aggiorna il testo con il valore arrotondato
       if (percentageRef.value) {
         percentageRef.value.textContent = Math.round(counter.value)
       }
     },
+    onComplete: () => {
+      // Quando arriva a 100, parte subito la transizione
+      emit('navigate', 'hero')
+    },
   })
-
-  // Animazione di uscita del numero (slide up + fade)
-  tl.to(
-    percentageRef.value,
-    {
-      y: '-100%',
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power3.inOut',
-    },
-    '+=0.3', // Piccola pausa dopo il 100
-  )
-
-  // Fade out del loader
-  tl.to(
-    loaderRef.value,
-    {
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-      onComplete: () => {
-        // Naviga verso HeroPage
-        emit('navigate', 'hero')
-      },
-    },
-    '-=0.3',
-  )
 }
 
 // ===== LIFECYCLE =====

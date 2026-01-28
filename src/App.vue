@@ -1,26 +1,15 @@
-<!--
-  App.vue - Componente principale dell'applicazione
-
-  Gestisce il routing tra le tre viste principali:
-  - IntroPage: pagina di introduzione con animazione testi
-  - HeroPage: homepage con titolo e image trail
-  - MainContainer: griglia principale con i dipinti
-
-  Le transizioni tra le viste sono animate con GSAP
--->
 <template>
   <div class="app-container">
-    <!-- Vista Intro: animazione iniziale con nomi artisti/musei -->
+    <div class="transition-overlay" ref="transitionRef"></div>
+
     <div ref="introRef" class="view-container" v-if="currentView === 'intro'">
       <IntroPage @navigate="handleNavigate" />
     </div>
 
-    <!-- Vista Hero: homepage con titolo "War On Canvas" e image trail -->
     <div ref="heroRef" class="view-container" v-if="currentView === 'hero'">
       <HeroPage @navigate="handleNavigate" />
     </div>
 
-    <!-- Vista Main: griglia interattiva con tutti i dipinti -->
     <div ref="mainRef" class="view-container" v-if="currentView === 'main'">
       <MainContainer @navigate="handleNavigate" />
     </div>
@@ -28,85 +17,130 @@
 </template>
 
 <script setup>
-// ===== IMPORTS =====
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import IntroPage from './components/IntroPage.vue'
 import HeroPage from './components/HeroPage.vue'
 import MainContainer from './components/MainContainer.vue'
 import gsap from 'gsap'
 
-// ===== STATO REATTIVO =====
-const currentView = ref('intro') // Vista corrente: 'intro' | 'hero' | 'main'
-const introRef = ref(null) // Riferimento al container IntroPage
-const heroRef = ref(null) // Riferimento al container HeroPage
-const mainRef = ref(null) // Riferimento al container MainContainer
+const currentView = ref('intro')
+const introRef = ref(null)
+const heroRef = ref(null)
+const mainRef = ref(null)
+const transitionRef = ref(null)
 
-// ===== FUNZIONE DI TRANSIZIONE =====
+// ===== TRANSIZIONE =====
 /**
- * Gestisce le transizioni animate tra le viste
- * @param {string} targetView - La vista di destinazione ('intro' | 'hero' | 'main')
+ * @returns {Promise}
  */
-const handleNavigate = async (targetView) => {
-  // Configurazioni per ogni tipo di transizione
-  const transitions = {
-    // Da Intro a Hero
-    'intro-hero': {
-      fromRef: introRef,
-      toRef: heroRef,
-      fromAnim: { y: -50, ease: 'power2.in' },
-      toAnim: { fromY: 50, ease: 'power2.out' },
-    },
-    // Da Hero a Main
-    'hero-main': {
-      fromRef: heroRef,
-      toRef: mainRef,
-      fromAnim: { y: -150, ease: 'power3.in' },
-      toAnim: { fromY: 50, ease: 'power2.out' },
-    },
-    // Da Main a Hero
-    'main-hero': {
-      fromRef: mainRef,
-      toRef: heroRef,
-      fromAnim: { y: 150, ease: 'power2.in' },
-      toAnim: { fromY: -50, ease: 'power2.out' },
-    },
-  }
+const transitionIn = () => {
+  return new Promise((resolve) => {
+    const overlay = transitionRef.value
+    if (!overlay) {
+      resolve()
+      return
+    }
 
-  // Determina quale transizione eseguire
-  const transitionKey = `${currentView.value}-${targetView}`
-  const config = transitions[transitionKey]
-
-  if (!config) return
-
-  // Anima l'uscita della vista corrente
-  const fromEl = config.fromRef.value
-  if (fromEl) {
-    await gsap.to(fromEl, {
-      opacity: 0,
-      y: config.fromAnim.y,
-      duration: 0.8,
-      ease: config.fromAnim.ease,
+    gsap.set(overlay, {
+      display: 'block',
+      yPercent: 100
     })
+
+    gsap.to(overlay, {
+      yPercent: 0,
+      duration: 0.8,
+      ease: 'power3.inOut',
+      onComplete: resolve,
+    })
+  })
+}
+
+/**
+
+ * @returns {Promise}
+ */
+const transitionOut = () => {
+  return new Promise((resolve) => {
+    const overlay = transitionRef.value
+    if (!overlay) {
+      resolve()
+      return
+    }
+
+    gsap.to(overlay, {
+      yPercent: -100,
+      duration: 0.8,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        gsap.set(overlay, { display: 'none' })
+        resolve()
+      },
+    })
+  })
+}
+
+const handleNavigate = async (targetView) => {
+  if (currentView.value === 'intro' && targetView === 'hero') {
+    await transitionIn()
+
+    if (introRef.value) {
+      gsap.set(introRef.value, { opacity: 0 })
+    }
+
+    currentView.value = targetView
+    await nextTick()
+
+    if (heroRef.value) {
+      gsap.set(heroRef.value, { opacity: 1 })
+    }
+
+    await transitionOut()
   }
+  else if (currentView.value === 'hero' && targetView === 'main') {
+    await transitionIn()
 
-  // Cambia la vista corrente
-  currentView.value = targetView
-  await nextTick()
+    if (heroRef.value) {
+      gsap.set(heroRef.value, { opacity: 0 })
+    }
 
-  // Anima l'entrata della nuova vista
-  const toEl = config.toRef.value
-  if (toEl) {
-    gsap.fromTo(
-      toEl,
-      { opacity: 0, y: config.toAnim.fromY },
-      { opacity: 1, y: 0, duration: 0.8, ease: config.toAnim.ease },
-    )
+    currentView.value = targetView
+    await nextTick()
+
+    if (mainRef.value) {
+      gsap.set(mainRef.value, { opacity: 1 })
+    }
+
+    await transitionOut()
+  }
+  else if (currentView.value === 'main' && targetView === 'hero') {
+    await transitionIn()
+
+    if (mainRef.value) {
+      gsap.set(mainRef.value, { opacity: 0 })
+    }
+
+    currentView.value = targetView
+    await nextTick()
+
+    if (heroRef.value) {
+      gsap.set(heroRef.value, { opacity: 1 })
+    }
+
+    await transitionOut()
   }
 }
+
+onMounted(() => {
+  if (transitionRef.value) {
+    gsap.set(transitionRef.value, {
+      display: 'none',
+      yPercent: 100
+    })
+  }
+})
 </script>
 
 <style scoped>
-/* Container principale - occupa tutta la viewport */
 .app-container {
   position: relative;
   width: 100vw;
@@ -114,7 +148,6 @@ const handleNavigate = async (targetView) => {
   overflow: hidden;
 }
 
-/* Container per ogni vista - posizionamento assoluto per sovrapporre */
 .view-container {
   position: absolute;
   top: 0;
@@ -122,22 +155,31 @@ const handleNavigate = async (targetView) => {
   width: 100%;
   height: 100%;
 }
+
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background-color: #c49852;
+  display: none;
+  pointer-events: none;
+}
 </style>
 
-<!-- Stili globali -->
+
 <style>
-/* Import font EB Garamond - font principale dell'app */
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oranienbaum&display=swap');
 
-/* Reset CSS base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Sfondo dell'applicazione */
 body {
   background: #f5f5f5;
 }

@@ -1,13 +1,5 @@
-<!--
-  MainGrid.vue - Griglia principale dei dipinti
-
-  Organizza i dipinti in colonne verticali.
-  I dipinti sono distribuiti ciclicamente tra le colonne.
-  La griglia è ripetuta 4 volte per creare un effetto infinito.
--->
 <template>
   <div class="grid" ref="gridRef">
-    <!-- Griglia ripetuta 4 volte per effetto infinito -->
     <MainColumn
       v-for="(columnPaintings, index) in columns"
       :key="`col-1-${index}`"
@@ -49,16 +41,12 @@ const props = defineProps({
 })
 
 // ===== STATO =====
-const gridRef = ref(null) // Riferimento DOM per drag/scroll
+const gridRef = ref(null)
 
 // ===== EVENTI =====
 const emit = defineEmits(['painting-click'])
 
 // ===== COMPUTED =====
-/**
- * Distribuisce i dipinti in 5 colonne
- * Ogni dipinto va nella colonna corrispondente al suo indice % 5
- */
 const columns = computed(() => {
   const numColumns = 5
   const cols = Array.from({ length: numColumns }, () => [])
@@ -72,27 +60,24 @@ const columns = computed(() => {
 })
 
 // ===== METODI =====
-/** Propaga l'evento click sul dipinto al parent */
 const handlePaintingClick = (clickData) => {
   emit('painting-click', clickData)
 }
 
-// Espone il riferimento della griglia al parent
 defineExpose({ gridRef })
 </script>
 
 <style scoped>
-/* Griglia flex orizzontale */
 .grid {
   position: absolute;
   width: max-content;
   height: max-content;
   display: flex;
   gap: 10vw;
-  touch-action: pan-x pan-y; /* Abilita scroll touch */
+  touch-action: pan-x pan-y;
 
   @media (max-width: 768px) {
-    gap: 20vw; /* Più spazio tra colonne su mobile */
+    gap: 20vw;
   }
 }
 </style>
